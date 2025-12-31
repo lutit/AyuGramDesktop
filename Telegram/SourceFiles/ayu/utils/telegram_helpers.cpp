@@ -399,13 +399,13 @@ QString getLocalizedAt() {
 QString formatDateTime(const QDateTime &date) {
 	const auto locale = QLocale::system();
 	const auto datePart = locale.toString(date.date(), QLocale::ShortFormat);
-	const auto timePart = locale.toString(date.time(), Ui::TimeFormat());
+	const auto timePart = Ui::FormatTime(date.time());
 
 	return datePart + getLocalizedAt() + timePart;
 }
 
 QString formatMessageTime(const QTime &time) {
-	return QLocale().toString(time, Ui::TimeFormat());
+	return Ui::FormatTime(time);
 }
 
 int getMediaSizeBytes(not_null<HistoryItem*> message) {

@@ -7,7 +7,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #pragma once
 
+#include <QtCore/QDateTime>
 #include <QtCore/QLocale>
+#include <QtCore/QTime>
 
 namespace Ui {
 
@@ -20,8 +22,9 @@ inline const QString kCreditsCurrency = u"XTR"_q;
 [[nodiscard]] QString FormatSizeText(qint64 size);
 [[nodiscard]] QString FormatDownloadText(qint64 ready, qint64 total);
 [[nodiscard]] QString FormatProgressText(qint64 ready, qint64 total);
-[[nodiscard]] QLocale::FormatType TimeFormat();
-[[nodiscard]] QLocale::FormatType DateTimeFormat();
+[[nodiscard]] QString TimeFormatString();
+[[nodiscard]] QString FormatTime(const QTime &time);
+[[nodiscard]] QString FormatDateTimeLocal(const QDateTime &dateTime);
 [[nodiscard]] QString FormatDateTime(QDateTime date);
 [[nodiscard]] QString FormatDateTimeSavedFrom(QDateTime date);
 [[nodiscard]] QString FormatDurationText(qint64 duration);

@@ -22,7 +22,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/palette.h"
 
 #include <QtGui/QtEvents>
-#include <QtCore/QLocale>
 
 namespace Ui {
 
@@ -313,9 +312,7 @@ void GroupCallBar::paintTitleAndStatus(Painter &p) {
 		}
 		const auto parsed = base::unixtime::parse(_content.scheduleDate);
 		const auto date = parsed.date();
-		const auto time = QLocale().toString(
-			parsed.time(),
-			TimeFormat());
+		const auto time = FormatTime(parsed.time());
 		const auto today = QDate::currentDate();
 		if (date == today) {
 			return tr::lng_group_call_starts_today(tr::now, lt_time, time);

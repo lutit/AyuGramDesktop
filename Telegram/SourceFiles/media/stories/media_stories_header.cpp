@@ -221,23 +221,18 @@ struct MadePrivacyBadge {
 	}
 	const auto whenFull = base::unixtime::parse(when);
 	const auto nowFull = base::unixtime::parse(now);
-	const auto locale = QLocale();
 	auto tomorrow = nowFull;
 	tomorrow.setDate(nowFull.date().addDays(1));
 	tomorrow.setTime(QTime(0, 0, 1));
 	const auto seconds = int(nowFull.secsTo(tomorrow));
 	if (whenFull.date() == nowFull.date()) {
-		const auto whenTime = locale.toString(
-			whenFull.time(),
-			Ui::TimeFormat());
+		const auto whenTime = Ui::FormatTime(whenFull.time());
 		return {
 			tr::lng_mediaview_today(tr::now, lt_time, whenTime),
 			seconds,
 		};
 	} else if (whenFull.date().addDays(1) == nowFull.date()) {
-		const auto whenTime = locale.toString(
-			whenFull.time(),
-			Ui::TimeFormat());
+		const auto whenTime = Ui::FormatTime(whenFull.time());
 		return {
 			tr::lng_mediaview_yesterday(tr::now, lt_time, whenTime),
 			seconds,

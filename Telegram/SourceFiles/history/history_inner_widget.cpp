@@ -3636,14 +3636,14 @@ TextForMimeData HistoryInner::getSelectedText() const {
 	const auto wrapItem = [&](
 			not_null<HistoryItem*> item,
 			TextForMimeData &&unwrapped) {
-			const auto i = texts.emplace(item->position(), Part{
-				.name = item->author()->name(),
-				.time = QString(", [%1]\n").arg(
-					QLocale().toString(ItemDateTime(item), Ui::DateTimeFormat())),
-				.unwrapped = std::move(unwrapped),
-			}).first;
-		fullSize += i->second.time.size()
-			+ i->second.name.size()
+		const auto i = texts.emplace(item->position(), Part{
+			.name = item->author()->name(),
+			.time = QString(", [%1]\n").arg(
+				Ui::FormatDateTimeLocal(ItemDateTime(item))),
+			.unwrapped = std::move(unwrapped),
+		}).first;
+		fullSize += i->second.name.size()
+			+ i->second.time.size()
 			+ 2
 			+ i->second.unwrapped.expanded.size();
 	};

@@ -3732,9 +3732,7 @@ void PricesBox(
 		st::boxPadding);
 	for (const auto &price : list) {
 		const auto parsed = base::unixtime::parse(price.date);
-		const auto time = QLocale().toString(
-			parsed.time(),
-			Ui::TimeFormat());
+		const auto time = Ui::FormatTime(parsed.time());
 		const auto date = tr::lng_month_day(
 			tr::now,
 			lt_month,

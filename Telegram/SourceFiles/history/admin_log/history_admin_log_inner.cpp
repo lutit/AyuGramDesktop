@@ -13,6 +13,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/history_item.h"
 #include "history/history_item_components.h"
 #include "history/history_item_text.h"
+#include "ui/text/format_values.h"
 #include "history/admin_log/history_admin_log_section.h"
 #include "history/admin_log/history_admin_log_filter.h"
 #include "history/view/history_view_context_menu.h"
@@ -637,9 +638,7 @@ QString InnerWidget::tooltipText() const {
 				dateText += '\n' + tr::lng_sent_date(
 					tr::now,
 					lt_date,
-					QLocale().toString(
-						base::unixtime::parse(sentIt->second),
-						QLocale::LongFormat));
+					Ui::FormatDateTimeLocal(base::unixtime::parse(sentIt->second)));
 			}
 			return dateText;
 		}

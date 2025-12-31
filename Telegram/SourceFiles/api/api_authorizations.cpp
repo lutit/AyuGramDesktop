@@ -261,7 +261,7 @@ QString Authorizations::ActiveDateString(TimeId active) {
 	const auto nowDate = now.date();
 	const auto lastDate = lastTime.date();
 	return (lastDate == nowDate)
-		? QLocale().toString(lastTime.time(), Ui::TimeFormat())
+		? Ui::FormatTime(lastTime.time())
 		: (lastDate.year() == nowDate.year()
 			&& lastDate.weekNumber() == nowDate.weekNumber())
 		? langDayOfWeek(lastDate)

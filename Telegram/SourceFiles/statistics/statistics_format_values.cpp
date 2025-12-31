@@ -42,7 +42,7 @@ QString LangDetailedDayMonth(crl::time seconds) {
 	if (dateTime.toUTC().time().hour() || dateTime.toUTC().time().minute()) {
 		constexpr auto kOneDay = 3600 * 24;
 		if (seconds < kOneDay) {
-			return QLocale().toString(dateTime, Ui::DateTimeFormat());
+			return Ui::FormatDateTimeLocal(dateTime);
 		}
 		return tr::lng_stats_weekday_day_month_time(
 			tr::now,
@@ -53,7 +53,7 @@ QString LangDetailedDayMonth(crl::time seconds) {
 			lt_month,
 			Lang::MonthSmall(dateTime.date().month())(tr::now),
 			lt_time,
-			QLocale().toString(dateTime.time(), Ui::TimeFormat()));
+			Ui::FormatTime(dateTime.time()));
 	} else {
 		return tr::lng_stats_weekday_day_month_year(
 			tr::now,

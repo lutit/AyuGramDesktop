@@ -195,7 +195,7 @@ void AddRecipient(not_null<Ui::GenericBox*> box, const TextWithEntities &t) {
 		lt_date,
 		langDayOfMonth(date.date()),
 		lt_time,
-		QLocale().toString(date.time(), Ui::TimeFormat()));
+		Ui::FormatTime(date.time()));
 }
 
 constexpr auto kMinus = QChar(0x2212);

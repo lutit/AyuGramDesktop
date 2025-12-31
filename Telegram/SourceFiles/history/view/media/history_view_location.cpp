@@ -208,14 +208,16 @@ void Location::updateLiveStatus() {
 			next = nowFull.secsTo(QDateTime(tomorrow, QTime(0, 0)));
 		};
 		const auto locale = QLocale();
-		const auto timeFormat = Ui::TimeFormat();
+		const auto formatTime = [](const QTime &time) {
+			return Ui::FormatTime(time);
+		};
 		if (dateFull.date() == nowFull.date()) {
 			nextTomorrow();
-			const auto time = locale.toString(dateFull.time(), timeFormat);
+			const auto time = formatTime(dateFull.time());
 			return tr::lng_live_location_today(tr::now, lt_time, time);
 		} else if (dateFull.date().addDays(1) == nowFull.date()) {
 			nextTomorrow();
-			const auto time = locale.toString(dateFull.time(), timeFormat);
+			const auto time = formatTime(dateFull.time());
 			return tr::lng_live_location_yesterday(tr::now, lt_time, time);
 		}
 		return tr::lng_live_location_date_time(
@@ -223,7 +225,7 @@ void Location::updateLiveStatus() {
 			lt_date,
 			locale.toString(dateFull.date(), QLocale::ShortFormat),
 			lt_time,
-			locale.toString(dateFull.time(), timeFormat));
+			formatTime(dateFull.time()));
 	}();
 	_description.setMarkedText(
 		st::webPageDescriptionStyle,

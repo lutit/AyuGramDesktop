@@ -16,6 +16,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "main/main_session.h"
 #include "api/api_invite_links.h"
 #include "settings/settings_credits_graphics.h"
+#include "ui/text/format_values.h"
 #include "ui/wrap/slide_wrap.h"
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/popup_menu.h"
@@ -206,7 +207,7 @@ private:
 				left / 86400));
 		} else {
 			const auto time = base::unixtime::parse(link.expireDate).time();
-			add(QLocale().toString(time, QLocale::LongFormat));
+			add(Ui::FormatTime(time));
 		}
 	}
 	return result;
