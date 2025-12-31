@@ -337,9 +337,7 @@ SendError RestrictionError(
 				auto date = QLocale().toString(
 					restrictedUntilDateTime.date(),
 					QLocale::ShortFormat);
-				auto time = QLocale().toString(
-					restrictedUntilDateTime.time(),
-					Ui::TimeFormat());
+				auto time = Ui::FormatTime(restrictedUntilDateTime.time());
 
 				switch (restriction) {
 				case Flag::SendPolls:

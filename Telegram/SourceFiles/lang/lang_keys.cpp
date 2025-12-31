@@ -159,7 +159,7 @@ QString langDateTime(const QDateTime &date) {
 		lt_date,
 		langDayOfMonth(date.date()),
 		lt_time,
-		QLocale().toString(date.time(), Ui::TimeFormat()));
+		Ui::FormatTime(date.time()));
 }
 
 QString langDateTimeFull(const QDateTime &date) {
@@ -168,7 +168,7 @@ QString langDateTimeFull(const QDateTime &date) {
 		lt_date,
 		langDayOfMonthFull(date.date()),
 		lt_time,
-		QLocale().toString(date.time(), Ui::TimeFormat()));
+		Ui::FormatTime(date.time()));
 }
 
 namespace Lang {

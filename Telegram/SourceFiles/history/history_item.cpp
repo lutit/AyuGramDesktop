@@ -7502,9 +7502,7 @@ PreparedServiceText HistoryItem::prepareCallScheduledText(
 				tr::marked);
 		}
 	};
-	const auto time = QLocale().toString(
-		scheduled.time(),
-		Ui::TimeFormat());
+	const auto time = Ui::FormatTime(scheduled.time());
 	const auto prepareGeneric = [&] {
 		prepareWithDate(tr::lng_group_call_starts_date(
 			tr::now,

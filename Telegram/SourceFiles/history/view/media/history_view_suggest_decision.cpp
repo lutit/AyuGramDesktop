@@ -207,9 +207,7 @@ auto GenerateSuggestDecisionMedia(
 								date.date(),
 								QLocale::ShortFormat),
 							lt_time,
-							QLocale().toString(
-								date.time(),
-								Ui::TimeFormat()))),
+							Ui::FormatTime(date.time()))),
 						tr::marked)),
 				(price
 					? st::chatSuggestInfoMiddleMargin

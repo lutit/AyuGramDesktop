@@ -52,14 +52,25 @@ constexpr auto kSecondsInYear = 365 * 24 * 60 * 60; // 31536000
 
 } // namespace
 
-QLocale::FormatType TimeFormat() {
-	return AyuSettings::getInstance().showMessageSeconds
-		? QLocale::LongFormat
-		: QLocale::ShortFormat;
+QString TimeFormatString() {
+	if (!AyuSettings::getInstance().showMessageSeconds) {
+		return QLocale().timeFormat(QLocale::ShortFormat);
+	}
+	const auto shortFormat = QLocale().timeFormat(QLocale::ShortFormat);
+	const auto usesAmPm = shortFormat.contains("AP")
+		|| shortFormat.contains("ap");
+	return usesAmPm ? QString("h:mm:ss AP") : QString("HH:mm:ss");
 }
 
-QLocale::FormatType DateTimeFormat() {
-	return TimeFormat();
+QString FormatTime(const QTime &time) {
+	return QLocale().toString(time, TimeFormatString());
+}
+
+QString FormatDateTimeLocal(const QDateTime &dateTime) {
+	const auto locale = QLocale();
+	const auto datePart = locale.toString(dateTime.date(), QLocale::ShortFormat);
+	const auto timePart = FormatTime(dateTime.time());
+	return datePart + QChar(' ') + timePart;
 }
 
 QString FormatSizeText(qint64 size) {
@@ -98,28 +109,26 @@ QString FormatDateTime(QDateTime date) {
 		return tr::lng_mediaview_today(
 			tr::now,
 			lt_time,
-			QLocale().toString(date.time(), TimeFormat()));
+			FormatTime(date.time()));
 	} else if (date.date().addDays(1) == now.date()) {
 		return tr::lng_mediaview_yesterday(
 			tr::now,
 			lt_time,
-			QLocale().toString(date.time(), TimeFormat()));
+			FormatTime(date.time()));
 	} else {
 		return tr::lng_mediaview_date_time(
 			tr::now,
 			lt_date,
 			QLocale().toString(date.date(), QLocale::ShortFormat),
 			lt_time,
-			QLocale().toString(date.time(), TimeFormat()));
+			FormatTime(date.time()));
 	}
 }
 
 QString FormatDateTimeSavedFrom(QDateTime dateTime) {
 	const auto current = QDate::currentDate();
 	const auto date = dateTime.date();
-	const auto timeStr = QLocale().toString(
-		dateTime.time(),
-		TimeFormat());
+	const auto timeStr = FormatTime(dateTime.time());
 
 	if (date == current) {
 		return tr::lng_mediaview_today(tr::now, lt_time, timeStr);
@@ -544,7 +553,7 @@ QString FormatDialogsDate(const QDateTime &lastTime) {
 
 	if ((lastDate == nowDate)
 		|| (std::abs(lastTime.secsTo(now)) < kRecentlyInSeconds)) {
-		return QLocale().toString(lastTime.time(), TimeFormat());
+		return FormatTime(lastTime.time());
 	} else if (std::abs(lastDate.daysTo(nowDate)) < 7) {
 		return langDayOfWeek(lastDate);
 	} else {

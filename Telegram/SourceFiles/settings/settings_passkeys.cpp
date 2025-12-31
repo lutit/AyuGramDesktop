@@ -314,7 +314,7 @@ void Passkeys::setupContent(
 					lt_date,
 					langDayOfMonthFull(dt.date()),
 					lt_time,
-					QLocale().toString(dt.time(), Ui::TimeFormat()));
+					Ui::FormatTime(dt.time()));
 			};
 			const auto date = (passkey.lastUsageDate > 0)
 				? tr::lng_settings_passkeys_last_used(

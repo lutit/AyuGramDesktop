@@ -180,9 +180,7 @@ void ReceiveSomeMouseEvents(
 
 	const auto parsed = base::unixtime::parse(value);
 	const auto date = parsed.date();
-	const auto time = QLocale().toString(
-		parsed.time(),
-		Ui::TimeFormat());
+	const auto time = Ui::FormatTime(parsed.time());
 	const auto today = QDateTime::currentDateTime().date();
 	const auto text = (date == today)
 		? tr::lng_context_sent_today(tr::now, lt_time, time)
