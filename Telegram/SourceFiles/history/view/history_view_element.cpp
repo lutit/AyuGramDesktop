@@ -622,7 +622,7 @@ QString DateTooltipText(not_null<Element*> view) {
 					dateText += '\n' + tr::lng_forwarded_saved_date(
 						tr::now,
 						lt_date,
-						locale.toString(parsed, format));
+						formatDateTime(parsed));
 				}
 			}
 		}
