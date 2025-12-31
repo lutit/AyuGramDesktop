@@ -18,6 +18,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/history_item_components.h"
 #include "history/history_item_helpers.h"
 #include "history/history_unread_things.h"
+#include "ui/text/format_values.h"
 #include "history/history.h"
 #include "iv/iv_data.h"
 #include "mtproto/mtproto_config.h"
@@ -7503,7 +7504,7 @@ PreparedServiceText HistoryItem::prepareCallScheduledText(
 	};
 	const auto time = QLocale().toString(
 		scheduled.time(),
-		QLocale::ShortFormat);
+		Ui::TimeFormat());
 	const auto prepareGeneric = [&] {
 		prepareWithDate(tr::lng_group_call_starts_date(
 			tr::now,

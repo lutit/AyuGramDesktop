@@ -9,6 +9,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "base/unixtime.h"
 #include "lang/lang_keys.h"
+#include "ui/text/format_values.h"
 
 #include <QtCore/QLocale>
 
@@ -41,7 +42,7 @@ QString LangDetailedDayMonth(crl::time seconds) {
 	if (dateTime.toUTC().time().hour() || dateTime.toUTC().time().minute()) {
 		constexpr auto kOneDay = 3600 * 24;
 		if (seconds < kOneDay) {
-			return QLocale().toString(dateTime, QLocale::ShortFormat);
+			return QLocale().toString(dateTime, Ui::DateTimeFormat());
 		}
 		return tr::lng_stats_weekday_day_month_time(
 			tr::now,
@@ -52,7 +53,7 @@ QString LangDetailedDayMonth(crl::time seconds) {
 			lt_month,
 			Lang::MonthSmall(dateTime.date().month())(tr::now),
 			lt_time,
-			QLocale().toString(dateTime.time(), QLocale::ShortFormat));
+			QLocale().toString(dateTime.time(), Ui::TimeFormat()));
 	} else {
 		return tr::lng_stats_weekday_day_month_year(
 			tr::now,

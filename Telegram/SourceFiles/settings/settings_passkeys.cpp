@@ -8,6 +8,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "settings/settings_passkeys.h"
 
 #include "settings/cloud_password/settings_cloud_password_common.h"
+#include "ui/text/format_values.h"
 #include "settings/settings_common_session.h"
 #include "data/components/passkeys.h"
 #include "data/data_session.h"
@@ -313,7 +314,7 @@ void Passkeys::setupContent(
 					lt_date,
 					langDayOfMonthFull(dt.date()),
 					lt_time,
-					QLocale().toString(dt.time(), QLocale::ShortFormat));
+					QLocale().toString(dt.time(), Ui::TimeFormat()));
 			};
 			const auto date = (passkey.lastUsageDate > 0)
 				? tr::lng_settings_passkeys_last_used(

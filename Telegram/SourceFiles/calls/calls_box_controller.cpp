@@ -8,6 +8,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "calls/calls_box_controller.h"
 
 #include "lang/lang_keys.h"
+#include "ui/text/format_values.h"
 #include "ui/effects/ripple_animation.h"
 #include "ui/layers/generic_box.h"
 #include "ui/text/text_utilities.h"
@@ -417,7 +418,7 @@ void BoxController::Row::refreshStatus() {
 		return;
 	}
 	auto text = [this] {
-		auto time = QLocale().toString(ItemDateTime(_items.front()).time(), QLocale::ShortFormat);
+		auto time = QLocale().toString(ItemDateTime(_items.front()).time(), Ui::TimeFormat());
 		auto today = QDateTime::currentDateTime().date();
 		if (_date == today) {
 			return tr::lng_call_box_status_today(tr::now, lt_time, time);

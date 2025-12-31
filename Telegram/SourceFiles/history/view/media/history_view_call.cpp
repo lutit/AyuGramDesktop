@@ -8,6 +8,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/view/media/history_view_call.h"
 
 #include "lang/lang_keys.h"
+#include "ui/text/format_values.h"
 #include "ui/chat/chat_style.h"
 #include "ui/text/format_values.h"
 #include "ui/painter.h"
@@ -50,7 +51,7 @@ Call::Call(
 	_text = Data::MediaCall::Text(item, _state, _conference, _video);
 	_status = QLocale().toString(
 		parent->dateTime().time(),
-		QLocale::ShortFormat);
+		Ui::TimeFormat());
 	if (_duration) {
 		_status = tr::lng_call_duration_info(
 			tr::now,

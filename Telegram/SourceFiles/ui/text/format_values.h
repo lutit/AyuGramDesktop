@@ -7,6 +7,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #pragma once
 
+#include <QtCore/QLocale>
+
 namespace Ui {
 
 inline constexpr auto FileStatusSizeReady = 0xFFFFFFF0LL;
@@ -18,6 +20,8 @@ inline const QString kCreditsCurrency = u"XTR"_q;
 [[nodiscard]] QString FormatSizeText(qint64 size);
 [[nodiscard]] QString FormatDownloadText(qint64 ready, qint64 total);
 [[nodiscard]] QString FormatProgressText(qint64 ready, qint64 total);
+[[nodiscard]] QLocale::FormatType TimeFormat();
+[[nodiscard]] QLocale::FormatType DateTimeFormat();
 [[nodiscard]] QString FormatDateTime(QDateTime date);
 [[nodiscard]] QString FormatDateTimeSavedFrom(QDateTime date);
 [[nodiscard]] QString FormatDurationText(qint64 duration);

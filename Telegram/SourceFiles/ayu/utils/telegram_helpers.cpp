@@ -53,6 +53,7 @@
 #include "styles/style_ayu_styles.h"
 #include "ui/text/text_utilities.h"
 #include "ui/text/text_entity.h"
+#include "ui/text/format_values.h"
 #include "ui/toast/toast.h"
 
 namespace {
@@ -390,25 +391,13 @@ QString getLocalizedAt() {
 QString formatDateTime(const QDateTime &date) {
 	const auto locale = QLocale::system();
 	const auto datePart = locale.toString(date.date(), QLocale::ShortFormat);
-	const auto timePart = locale.toString(date, "HH:mm:ss");
+	const auto timePart = locale.toString(date.time(), Ui::TimeFormat());
 
 	return datePart + getLocalizedAt() + timePart;
 }
 
 QString formatMessageTime(const QTime &time) {
-	const auto &settings = AyuSettings::getInstance();
-
-	const auto format =
-		settings.showMessageSeconds
-			? (QLocale().timeFormat(QLocale::ShortFormat).contains("AP")
-				   ? "h:mm:ss AP"
-				   : "HH:mm:ss")
-			: QLocale().timeFormat(QLocale::ShortFormat);
-
-	return QLocale().toString(
-		time,
-		format
-	);
+	return QLocale().toString(time, Ui::TimeFormat());
 }
 
 int getMediaSizeBytes(not_null<HistoryItem*> message) {

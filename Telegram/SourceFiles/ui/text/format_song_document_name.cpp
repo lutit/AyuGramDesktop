@@ -14,6 +14,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/history_item.h"
 #include "lang/lang_keys.h"
 #include "ui/text/text_utilities.h"
+#include "ui/text/format_values.h"
 
 #include <QtCore/QLocale>
 
@@ -57,7 +58,7 @@ FormatSongName FormatVoiceName(
 			const auto date = parsed.date();
 			const auto time = QLocale().toString(
 				parsed.time(),
-				QLocale::ShortFormat);
+				Ui::TimeFormat());
 			const auto today = QDateTime::currentDateTime().date();
 			if (date == today) {
 				return tr::lng_player_message_today(

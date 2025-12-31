@@ -8,6 +8,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/controls/who_reacted_context_action.h"
 
 #include "base/call_delayed.h"
+#include "ui/text/format_values.h"
 #include "ui/widgets/menu/menu_action.h"
 #include "ui/widgets/popup_menu.h"
 #include "ui/effects/ripple_animation.h"
@@ -566,7 +567,7 @@ void WhenAction::resolveMinWidth() {
 	const auto sampleDate = QDate::currentDate();
 	const auto sampleTime = QLocale().toString(
 		QTime::currentTime(),
-		QLocale::ShortFormat);
+		Ui::TimeFormat());
 	const auto maxTextWidth = added + std::max({
 		width(tr::lng_contacts_loading(tr::now)),
 		(width(tr::lng_context_read_hidden(tr::now))
