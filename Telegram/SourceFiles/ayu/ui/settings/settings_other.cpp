@@ -21,14 +21,12 @@
 #include "styles/style_settings.h"
 #include "ui/integration.h"
 #include "ui/painter.h"
-#include "ui/rect.h"
 #include "ui/vertical_list.h"
 #include "ui/boxes/confirm_box.h"
 #include "ui/text/text_utilities.h"
 #include "ui/widgets/buttons.h"
 #include "ui/wrap/vertical_layout.h"
 #include "window/window_session_controller.h"
-#include "window/themes/window_theme.h"
 
 #include <QDesktopServices>
 #include <QGuiApplication>
@@ -40,7 +38,6 @@ using namespace Builder;
 using namespace AyBuilder;
 
 namespace {
-
 struct Asset {
 	QString icon;
 	QColor background;
@@ -261,5 +258,4 @@ void AyuOther::setupContent() {
 Type AyuOtherId() {
 	return AyuOther::Id();
 }
-
 } // namespace Settings
