@@ -3734,7 +3734,7 @@ void PricesBox(
 		const auto parsed = base::unixtime::parse(price.date);
 		const auto time = QLocale().toString(
 			parsed.time(),
-			QLocale::ShortFormat);
+			Ui::TimeFormat());
 		const auto date = tr::lng_month_day(
 			tr::now,
 			lt_month,

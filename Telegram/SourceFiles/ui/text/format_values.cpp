@@ -10,6 +10,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/unixtime.h"
 #include "lang/lang_keys.h"
 #include "countries/countries_instance.h"
+#include "ayu/ayu_settings.h"
 
 #include <QtCore/QLocale>
 #include <locale>
@@ -51,6 +52,16 @@ constexpr auto kSecondsInYear = 365 * 24 * 60 * 60; // 31536000
 
 } // namespace
 
+QLocale::FormatType TimeFormat() {
+	return AyuSettings::getInstance().showMessageSeconds
+		? QLocale::LongFormat
+		: QLocale::ShortFormat;
+}
+
+QLocale::FormatType DateTimeFormat() {
+	return TimeFormat();
+}
+
 QString FormatSizeText(qint64 size) {
 	if (size >= 1024 * 1024) { // more than 1 mb
 		const qint64 sizeTenthMb = (size * 10 / (1024 * 1024));
@@ -87,19 +98,19 @@ QString FormatDateTime(QDateTime date) {
 		return tr::lng_mediaview_today(
 			tr::now,
 			lt_time,
-			QLocale().toString(date.time(), QLocale::ShortFormat));
+			QLocale().toString(date.time(), TimeFormat()));
 	} else if (date.date().addDays(1) == now.date()) {
 		return tr::lng_mediaview_yesterday(
 			tr::now,
 			lt_time,
-			QLocale().toString(date.time(), QLocale::ShortFormat));
+			QLocale().toString(date.time(), TimeFormat()));
 	} else {
 		return tr::lng_mediaview_date_time(
 			tr::now,
 			lt_date,
 			QLocale().toString(date.date(), QLocale::ShortFormat),
 			lt_time,
-			QLocale().toString(date.time(), QLocale::ShortFormat));
+			QLocale().toString(date.time(), TimeFormat()));
 	}
 }
 
@@ -108,7 +119,7 @@ QString FormatDateTimeSavedFrom(QDateTime dateTime) {
 	const auto date = dateTime.date();
 	const auto timeStr = QLocale().toString(
 		dateTime.time(),
-		QLocale::ShortFormat);
+		TimeFormat());
 
 	if (date == current) {
 		return tr::lng_mediaview_today(tr::now, lt_time, timeStr);
@@ -533,7 +544,7 @@ QString FormatDialogsDate(const QDateTime &lastTime) {
 
 	if ((lastDate == nowDate)
 		|| (std::abs(lastTime.secsTo(now)) < kRecentlyInSeconds)) {
-		return QLocale().toString(lastTime.time(), QLocale::ShortFormat);
+		return QLocale().toString(lastTime.time(), TimeFormat());
 	} else if (std::abs(lastDate.daysTo(nowDate)) < 7) {
 		return langDayOfWeek(lastDate);
 	} else {

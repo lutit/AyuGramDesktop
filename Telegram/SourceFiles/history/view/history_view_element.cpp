@@ -22,6 +22,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/view/reactions/history_view_reactions_button.h"
 #include "history/view/history_view_reply_button.h"
 #include "history/view/reactions/history_view_reactions.h"
+#include "ui/text/format_values.h"
 #include "history/view/history_view_cursor_state.h"
 #include "history/view/history_view_reply.h"
 #include "history/view/history_view_text_helper.h"
@@ -643,7 +644,7 @@ TextSelection ShiftItemSelection(
 
 QString DateTooltipText(not_null<Element*> view) {
 	const auto locale = QLocale();
-	const auto format = QLocale::LongFormat;
+	const auto format = Ui::DateTimeFormat();
 	const auto item = view->data();
 	auto dateText = locale.toString(view->dateTime(), format);
 	if (item->awaitingVideoProcessing()) {

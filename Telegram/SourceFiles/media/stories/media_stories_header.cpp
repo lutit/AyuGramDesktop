@@ -8,6 +8,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "media/stories/media_stories_header.h"
 
 #include "base/unixtime.h"
+#include "ui/text/format_values.h"
 #include "chat_helpers/compose/compose_show.h"
 #include "core/ui_integration.h"
 #include "data/stickers/data_custom_emoji.h"
@@ -228,7 +229,7 @@ struct MadePrivacyBadge {
 	if (whenFull.date() == nowFull.date()) {
 		const auto whenTime = locale.toString(
 			whenFull.time(),
-			QLocale::ShortFormat);
+			Ui::TimeFormat());
 		return {
 			tr::lng_mediaview_today(tr::now, lt_time, whenTime),
 			seconds,
@@ -236,7 +237,7 @@ struct MadePrivacyBadge {
 	} else if (whenFull.date().addDays(1) == nowFull.date()) {
 		const auto whenTime = locale.toString(
 			whenFull.time(),
-			QLocale::ShortFormat);
+			Ui::TimeFormat());
 		return {
 			tr::lng_mediaview_yesterday(tr::now, lt_time, whenTime),
 			seconds,

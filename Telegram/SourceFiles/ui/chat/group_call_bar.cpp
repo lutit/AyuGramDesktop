@@ -11,6 +11,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/widgets/shadow.h"
 #include "ui/widgets/buttons.h"
 #include "ui/painter.h"
+#include "ui/text/format_values.h"
 #include "lang/lang_keys.h"
 #include "base/unixtime.h"
 #include "styles/style_chat.h"
@@ -314,7 +315,7 @@ void GroupCallBar::paintTitleAndStatus(Painter &p) {
 		const auto date = parsed.date();
 		const auto time = QLocale().toString(
 			parsed.time(),
-			QLocale::ShortFormat);
+			TimeFormat());
 		const auto today = QDate::currentDate();
 		if (date == today) {
 			return tr::lng_group_call_starts_today(tr::now, lt_time, time);

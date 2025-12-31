@@ -9,6 +9,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "ui/rp_widget.h"
 #include "ui/painter.h"
+#include "ui/text/format_values.h"
 #include "lang/lang_keys.h"
 #include "base/unixtime.h"
 #include "base/timer_rpl.h"
@@ -36,7 +37,7 @@ rpl::producer<QString> StartsWhenText(rpl::producer<TimeId> date) {
 
 		const auto time = QLocale().toString(
 			parsedDate.time(),
-			QLocale::ShortFormat);
+			::Ui::TimeFormat());
 		auto exact = tr::lng_group_call_starts_short_date(
 			lt_date,
 			rpl::single(langDayOfMonthFull(dateDay.date())),

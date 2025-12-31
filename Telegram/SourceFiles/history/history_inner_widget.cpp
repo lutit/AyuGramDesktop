@@ -18,6 +18,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/view/media/history_view_save_document_action.h"
 #include "history/view/media/history_view_sticker.h"
 #include "history/view/media/history_view_web_page.h"
+#include "ui/text/format_values.h"
 #include "history/view/reactions/history_view_reactions.h"
 #include "history/view/reactions/history_view_reactions_button.h"
 #include "history/view/reactions/history_view_reactions_selector.h"
@@ -3635,12 +3636,12 @@ TextForMimeData HistoryInner::getSelectedText() const {
 	const auto wrapItem = [&](
 			not_null<HistoryItem*> item,
 			TextForMimeData &&unwrapped) {
-		const auto i = texts.emplace(item->position(), Part{
-			.name = item->author()->name(),
-			.time = QString("[%1] ").arg(
-				QLocale().toString(ItemDateTime(item), QLocale::ShortFormat)),
-			.unwrapped = std::move(unwrapped),
-		}).first;
+			const auto i = texts.emplace(item->position(), Part{
+				.name = item->author()->name(),
+				.time = QString(", [%1]\n").arg(
+					QLocale().toString(ItemDateTime(item), Ui::DateTimeFormat())),
+				.unwrapped = std::move(unwrapped),
+			}).first;
 		fullSize += i->second.time.size()
 			+ i->second.name.size()
 			+ 2

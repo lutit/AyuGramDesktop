@@ -17,6 +17,7 @@
 #include "styles/style_menu_icons.h"
 #include "styles/style_settings.h"
 #include "ui/boxes/confirm_box.h"
+#include "ui/vertical_list.h"
 #include "ui/boxes/single_choice_box.h"
 #include "ui/widgets/buttons.h"
 #include "ui/wrap/vertical_layout.h"
@@ -213,12 +214,12 @@ void BuildQoLToggles(SectionBuilder &builder, AyuSectionBuilder &ayu) {
 
 	builder.addSubsectionTitle(rpl::single(QString("Webview")));
 
-	ayu.addSettingToggle({
-		.id = u"ayu/spoofWebviewAsAndroid"_q,
-		.title = tr::ayu_SettingsSpoofWebviewAsAndroid(),
-		.getter = &AyuSettings::spoofWebviewAsAndroid,
-		.setter = &AyuSettings::setSpoofWebviewAsAndroid,
-	});
+		ayu.addSettingToggle({
+			.id = u"ayu/spoofWebviewAsAndroid"_q,
+			.title = tr::ayu_SettingsSpoofWebviewAsAndroid(),
+			.getter = &AyuSettings::spoofWebviewAsAndroid,
+			.setter = &AyuSettings::setSpoofWebviewAsAndroid,
+		});
 
 	ayu.addCollapsibleToggle({
 		.id = u"ayu/biggerWindow"_q,
@@ -297,5 +298,4 @@ void AyuGeneral::setupContent() {
 Type AyuGeneralId() {
 	return AyuGeneral::Id();
 }
-
 } // namespace Settings

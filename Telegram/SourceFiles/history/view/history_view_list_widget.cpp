@@ -8,6 +8,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/view/history_view_list_widget.h"
 
 #include "base/unixtime.h"
+#include "ui/text/format_values.h"
 #include "base/qt/qt_key_modifiers.h"
 #include "base/qt/qt_common_adapters.h"
 #include "history/history_item.h"
@@ -2618,8 +2619,8 @@ TextForMimeData ListWidget::getSelectedText() const {
 	const auto wrapItem = [&](
 			not_null<HistoryItem*> item,
 			TextForMimeData &&unwrapped) {
-		auto time = QString("[%1] ").arg(
-			QLocale().toString(ItemDateTime(item), QLocale::ShortFormat));
+		auto time = QString(", [%1]\n").arg(
+			QLocale().toString(ItemDateTime(item), Ui::DateTimeFormat()));
 		auto part = TextForMimeData();
 		auto size = time.size()
 			+ item->author()->name().size()
