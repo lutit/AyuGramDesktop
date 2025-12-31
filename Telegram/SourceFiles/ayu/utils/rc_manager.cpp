@@ -17,32 +17,21 @@ constexpr auto kExteraUrl = "https://api.exteragram.app/api/v1/profiles/compact"
 
 }
 
-std::unordered_set<ID> default_developers = {
-	139303278, 168769611, 668557709, 880708503, 963080346, 1156270028, 1282540315, 1348136086, 1374434073, 1752394339,
-	1773117711, 2135966128, 5079320635, 5118627360, 5184725450, 5330087923, 5800413909, 6007644928, 7380551229,
-	7738913005, 7818249287, 8083933640, 8512951856
-};
-
-std::unordered_set<ID> default_channels = {
-	1172503281, 1434550607, 1524581881, 1559501352, 1571726392, 1632728092, 1725670701, 1754537498, 1794457129,
-	1815864846, 1877362358, 1905581924, 1947958814, 1976430343, 2130395384, 2331068091, 2401498637, 2562664432,
-	2564770112, 2685666919, 3116497667, 3212977677, 3572293253
-};
+std::unordered_set<ID> default_developers = {};
+std::unordered_set<ID> default_channels = {};
 
 void RCManager::start() {
 	DEBUG_LOG(("RCManager: starting"));
-	_manager = std::make_unique<QNetworkAccessManager>();
-
-	makeRequest();
-
-	_timer = new QTimer(this);
-	connect(_timer, &QTimer::timeout, this, &RCManager::makeRequest);
-	_timer->start(60 * 60 * 1000); // 1 hour
+	initialized = true;
+	_developers.clear();
+	_officialChannels.clear();
+	_supporters.clear();
+	_supporterChannels.clear();
+	_customBadges.clear();
 }
 
 void RCManager::makeRequest() {
-	_retryAttempted = false;
-	sendRequest();
+	return;
 }
 
 void RCManager::sendRequest() {

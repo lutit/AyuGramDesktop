@@ -66,7 +66,6 @@ const auto regDateBotFallbackUsername = QString("ayugrambot");
 
 const auto kZalgoPattern = QStringLiteral(
 	"\\p{Mn}{3,}|[\\x{202A}-\\x{202E}\\x{2066}-\\x{2069}\\x{200E}\\x{200F}\\x{061C}]");
-
 }
 
 Main::Session *getSession(ID userId) {
@@ -1379,25 +1378,7 @@ void getUserRegistrationDateInner(
 }
 
 void getUserRegistrationDate(not_null<UserData*> user, Fn<void(TextWithEntities)> callback) {
-	const auto session = &user->session();
-	const auto selfId = getDialogIdFromPeer(session->user());
-	const auto isSupporter = isSupporterPeer(selfId) || isExteraPeer(selfId);
-
-	const auto botId = isSupporter ? regDateBotId : regDateBotFallbackId;
-	const auto botUsername = isSupporter ? regDateBotUsername : regDateBotFallbackUsername;
-
-	if (session->data().userLoaded(botId)) {
-		getUserRegistrationDateInner(user, botId, callback);
-	} else {
-		resolvePeer(
-			QString::number(botId),
-			botUsername,
-			session,
-			[=](const QString &title, PeerData *data)
-			{
-				getUserRegistrationDateInner(user, botId, callback);
-			});
-	}
+	callback(TextWithEntities{});
 }
 
 void getChannelJoinOrCreateDate(not_null<ChannelData*> channel, Fn<void(TextWithEntities)> callback) {

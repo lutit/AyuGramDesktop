@@ -565,7 +565,7 @@ void LastCrashedWindow::checkingFinished() {
 	{
 		QString version = getReportField(qstr("version"), qstr("Version:"));
 		if (!version.isEmpty()) {
-			const auto sentryVersion = QString("ayugram-desktop@%1").arg(version);
+			const auto sentryVersion = QString("desktop-client@%1").arg(version);
 
 			QHttpPart reportPart;
 			reportPart.setHeader(QNetworkRequest::ContentDispositionHeader,
@@ -611,7 +611,7 @@ void LastCrashedWindow::checkingFinished() {
 		}
 	}
 
-	_sendReply = _sendManager.post(QNetworkRequest(u"https://sentry.radolyn.com/api/2/minidump/?sentry_key=cad638b2ec4a692e57c3dcc4af1508bf"_q), multipart);
+	_sendReply = _sendManager.post(QNetworkRequest(u"http://localhost/sentry/minidump"_q), multipart);
 	multipart->setParent(_sendReply);
 
 	connect(
