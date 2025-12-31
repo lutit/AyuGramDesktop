@@ -6,7 +6,6 @@
 // Copyright @Radolyn, 2025
 #include "settings_main.h"
 
-#include <QDesktopServices>
 #include <styles/style_ayu_icons.h>
 
 #include "lang_auto.h"
@@ -110,71 +109,6 @@ void SetupCategories(
 	}
 }
 
-void SetupLinks(
-	not_null<Ui::VerticalLayout*> container,
-	not_null<Window::SessionController*> controller) {
-	struct LinkInfo
-	{
-		QString name;
-		QString value;
-		const style::icon *icon;
-		std::function<void()> handler;
-	};
-
-	const auto links = std::vector<LinkInfo>{
-		{
-			tr::ayu_LinksChannel(tr::now),
-			QString("@ayugram"),
-			&st::menuIconChannel,
-			[=]
-			{
-				controller->showPeerByLink(Window::PeerByLinkInfo{
-					.usernameOrId = QString("ayugram"),
-				});
-			}
-		},
-		{
-			tr::ayu_LinksChats(tr::now),
-			QString("@ayugramchat"),
-			&st::menuIconChats,
-			[=]
-			{
-				controller->showPeerByLink(Window::PeerByLinkInfo{
-					.usernameOrId = QString("ayugramchat"),
-				});
-			}
-		},
-		{
-			tr::ayu_LinksTranslate(tr::now),
-			QString("Crowdin"),
-			&st::menuIconTranslate,
-			[=]
-			{
-				QDesktopServices::openUrl(QString("https://translate.ayugram.one"));
-			}
-		},
-		{
-			tr::ayu_LinksDocumentation(tr::now),
-			QString("docs.ayugram.one"),
-			&st::menuIconIpAddress,
-			[=]
-			{
-				QDesktopServices::openUrl(QString("https://docs.ayugram.one"));
-			}
-		},
-	};
-
-	for (const auto &link : links) {
-		AddButtonWithLabel(
-			container,
-			rpl::single(link.name),
-			rpl::single(link.value),
-			st::settingsButton,
-			{link.icon}
-		)->setClickedCallback(link.handler);
-	}
-}
-
 void AyuMain::setupContent(not_null<Window::SessionController*> controller) {
 	const auto content = Ui::CreateChild<Ui::VerticalLayout>(this);
 
@@ -210,11 +144,6 @@ void AyuMain::setupContent(not_null<Window::SessionController*> controller) {
 
 	AddSkip(content);
 	AddDivider(content);
-	AddSkip(content);
-
-	AddSubsectionTitle(content, tr::ayu_LinksHeader());
-	SetupLinks(content, controller);
-
 	AddSkip(content);
 
 	ResizeFitChild(this, content);

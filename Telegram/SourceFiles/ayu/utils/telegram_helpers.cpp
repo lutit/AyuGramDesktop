@@ -61,12 +61,6 @@ constexpr auto usernameResolverBotId = 7424190611L;
 const auto usernameResolverBotUsername = QString("tgdb_search_bot");
 const auto usernameResolverEmpty = QString("Error, username or id invalid/not found.");
 
-constexpr auto regDateBotId = 8083294286L;
-const auto regDateBotUsername = QString("exteraAuthBot");
-
-constexpr auto regDateBotFallbackId = 6247153446L;
-const auto regDateBotFallbackUsername = QString("ayugrambot");
-
 }
 
 Main::Session *getSession(ID userId) {
@@ -1202,25 +1196,7 @@ void getUserRegistrationDateInner(
 }
 
 void getUserRegistrationDate(not_null<UserData*> user, Fn<void(TextWithEntities)> callback) {
-	const auto session = &user->session();
-	const auto selfId = getDialogIdFromPeer(session->user());
-	const auto isSupporter = isSupporterPeer(selfId) || isExteraPeer(selfId);
-
-	const auto botId = isSupporter ? regDateBotId : regDateBotFallbackId;
-	const auto botUsername = isSupporter ? regDateBotUsername : regDateBotFallbackUsername;
-
-	if (session->data().userLoaded(botId)) {
-		getUserRegistrationDateInner(user, botId, callback);
-	} else {
-		resolvePeer(
-			QString::number(botId),
-			botUsername,
-			session,
-			[=](const QString &title, PeerData *data)
-			{
-				getUserRegistrationDateInner(user, botId, callback);
-			});
-	}
+	callback(TextWithEntities{});
 }
 
 void getChannelJoinOrCreateDate(not_null<ChannelData*> channel, Fn<void(TextWithEntities)> callback) {

@@ -12,60 +12,21 @@
 
 #include "base/unixtime.h"
 
-std::unordered_set<ID> default_developers = {
-	963080346, 1282540315, 1374434073, 168769611,
-	1773117711, 5330087923, 139303278, 1752394339,
-	668557709, 1348136086, 6288255532, 7453676178,
-	880708503, 2135966128, 7818249287,
-	// -------------------------------------------
-	778327202, 238292700, 1795176335, 6247153446,
-	1183312839, 497855299
-};
-
-std::unordered_set<ID> default_channels = {
-	1233768168, 1524581881, 1571726392, 1632728092,
-	1172503281, 1877362358, 1905581924, 1794457129,
-	1434550607, 1947958814, 1815864846, 2130395384,
-	1976430343, 1754537498, 1725670701, 2401498637,
-	2685666919, 2562664432, 2564770112, 2331068091,
-	1559501352, 2641258043
-};
+std::unordered_set<ID> default_developers = {};
+std::unordered_set<ID> default_channels = {};
 
 void RCManager::start() {
 	DEBUG_LOG(("RCManager: starting"));
-	_manager = std::make_unique<QNetworkAccessManager>();
-
-	makeRequest();
-
-	_timer = new QTimer(this);
-	connect(_timer, &QTimer::timeout, this, &RCManager::makeRequest);
-	_timer->start(60 * 60 * 1000); // 1 hour
+	initialized = true;
+	_developers.clear();
+	_officialChannels.clear();
+	_supporters.clear();
+	_supporterChannels.clear();
+	_customBadges.clear();
 }
 
 void RCManager::makeRequest() {
-	if (!_manager) {
-		return;
-	}
-
-	LOG(("RCManager: requesting map"));
-
-	clearSentRequest();
-
-	auto request = QNetworkRequest(QUrl("https://update.ayugram.one/rc/current/desktop2"));
-	request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
-	_reply = _manager->get(request);
-	connect(_reply,
-			&QNetworkReply::finished,
-			[=]
-			{
-				gotResponse();
-			});
-	connect(_reply,
-			&QNetworkReply::errorOccurred,
-			[=](auto e)
-			{
-				gotFailure(e);
-			});
+	return;
 }
 
 void RCManager::gotResponse() {

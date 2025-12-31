@@ -86,15 +86,6 @@ void AboutBox(not_null<Ui::GenericBox*> box, Window::SessionController* controll
 	addText(Text());
 
 	box->addButton(tr::lng_close(), [=] { box->closeBox(); });
-	box->addLeftButton(
-		rpl::single(QString("@AyuGramReleases")),
-		[box, controller]
-		{
-			box->closeBox();
-			controller->showPeerByLink(Window::PeerByLinkInfo{
-				.usernameOrId = QString("ayugramreleases"),
-			});
-		});
 
 	box->setWidth(st::aboutWidth);
 }
@@ -263,4 +254,3 @@ void ArchiveHintBox(
 		box->addButton(std::move(button));
 	}
 }
-

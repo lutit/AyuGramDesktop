@@ -16,7 +16,7 @@
 - Media preview & quick reaction on force click (macOS)
 - Enhanced appearance
 
-And many more. Check out our [Documentation](https://docs.ayugram.one/desktop/).
+And many more. Check out [Telegram](https://telegram.org/) for more information.
 
 <h3>
   <details>
@@ -41,8 +41,7 @@ And many more. Check out our [Documentation](https://docs.ayugram.one/desktop/).
 
 #### Official
 
-You can download prebuilt Windows binary from [Releases tab](https://github.com/AyuGram/AyuGramDesktop/releases) or from
-the [Telegram channel](https://t.me/AyuGramReleases).
+You can download prebuilt Windows binary from the [Telegram channel](https://t.me/telegram).
 
 #### Winget
 
@@ -120,7 +119,7 @@ Make sure you have these components installed with VS Build Tools:
 
 Enjoy using **AyuGram**? Consider sending us a tip!
 
-[Here's available methods.](https://docs.ayugram.one/donate/)
+[Support Telegram here.](https://telegram.org/)
 
 ## Credits
 

@@ -15,7 +15,7 @@
 - Превью медиа и быстрая реакция при сильном нажатии на тачпад (macOS)
 - Улучшенный вид
 
-И многое другое. Посмотрите нашу [Документацию](https://docs.ayugram.one/desktop/) для более подробной информации.
+И многое другое. Подробнее на [Telegram](https://telegram.org/).
 
 <h3>
   <details>
@@ -41,7 +41,7 @@
 #### Официальная версия
 
 Вы можете скачать готовый бинарный файл со вкладки [Releases](https://github.com/AyuGram/AyuGramDesktop/releases) или из
-[Телеграм канала](https://t.me/AyuGramReleases).
+[Телеграм канале](https://t.me/telegram).
 
 #### Winget
 
@@ -119,7 +119,7 @@ Flatpak: https://github.com/0FL01/AyuGramDesktop-flatpak
 
 Вам нравится использовать **AyuGram**? Оставьте нам чаевые!
 
-[Здесь доступные варианты.](https://docs.ayugram.one/donate/)
+[Поддержать Telegram.](https://telegram.org/)
 
 ## Использованные материалы
 
