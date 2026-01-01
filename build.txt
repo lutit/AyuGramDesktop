@@ -1,0 +1,16 @@
+rm -rf out
+CC=gcc CXX=g++ cmake -B out -S . -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DDESKTOP_APP_USE_PACKAGED=ON \
+    -DTDESKTOP_API_ID=2040 \
+    -DTDESKTOP_API_HASH=b18441a1ff607e10a989891a5462e627 \
+    -DCMAKE_PREFIX_PATH=/opt/tg_owt \
+    -DDESKTOP_APP_GDBUSCODEGEN=/usr/bin/gdbus-codegen \
+    -DWITH_TESTS=OFF \
+    -DWITH_UPDATER=OFF \
+    -DDESKTOP_APP_DISABLE_CRASH_REPORTS=ON \
+    -DDESKTOP_APP_DISABLE_AUTOUPDATE=ON \
+    -DCMAKE_C_FLAGS="-Wno-error=sign-conversion" \
+    -DCMAKE_CXX_FLAGS="-Wno-error=sign-conversion"
+
+cmake --build out -j4
