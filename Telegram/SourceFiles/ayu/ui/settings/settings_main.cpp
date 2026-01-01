@@ -142,10 +142,6 @@ void AyuMain::setupContent(not_null<Window::SessionController*> controller) {
 	AddSubsectionTitle(content, tr::ayu_CategoriesHeader());
 	SetupCategories(content, controller, showOtherMethod());
 
-	AddSkip(content);
-	AddDivider(content);
-	AddSkip(content);
-
 	ResizeFitChild(this, content);
 }
 
