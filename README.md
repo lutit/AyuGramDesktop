@@ -1,5 +1,7 @@
 # AyuGram
 
+*version without donations, third-party servers, badges, and other garbage*
+
 ![AyuGram Logo](.github/AyuGram.png) ![AyuChan](.github/AyuChan.png)
 
 [ English  |   [Русский](README-RU.md) ]
