@@ -42,6 +42,8 @@ enum class TranslationProvider {
 	Telegram = 0,
 	Google = 1,
 	Yandex = 2,
+	DeepL = 3,
+	OpenAI = 4,
 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(PeerIdDisplay, {
@@ -66,6 +68,8 @@ NLOHMANN_JSON_SERIALIZE_ENUM(TranslationProvider, {
 	{TranslationProvider::Telegram, "telegram"},
 	{TranslationProvider::Google, "google"},
 	{TranslationProvider::Yandex, "yandex"},
+	{TranslationProvider::DeepL, "deepl"},
+	{TranslationProvider::OpenAI, "openai"},
 })
 
 class GhostModeAccountSettings {
@@ -319,6 +323,19 @@ public:
 	[[nodiscard]] bool gifConfirmation() const { return _gifConfirmation.current(); }
 	[[nodiscard]] bool voiceConfirmation() const { return _voiceConfirmation.current(); }
 	[[nodiscard]] TranslationProvider translationProvider() const { return _translationProvider.current(); }
+	[[nodiscard]] const QString &deeplApiBaseUrl() const { return _deeplApiBaseUrl.current(); }
+	[[nodiscard]] const QString &deeplApiKey() const { return _deeplApiKey.current(); }
+	[[nodiscard]] const QString &openaiApiBaseUrl() const { return _openaiApiBaseUrl.current(); }
+	[[nodiscard]] const QString &openaiApiKey() const { return _openaiApiKey.current(); }
+	[[nodiscard]] const QString &openaiModel() const { return _openaiModel.current(); }
+	[[nodiscard]] const QString &openaiAuthHeader() const { return _openaiAuthHeader.current(); }
+	[[nodiscard]] const QString &openaiAuthPrefix() const { return _openaiAuthPrefix.current(); }
+	[[nodiscard]] double openaiTemperature() const { return _openaiTemperature.current(); }
+	[[nodiscard]] int openaiMaxTokens() const { return _openaiMaxTokens.current(); }
+	[[nodiscard]] double openaiTopP() const { return _openaiTopP.current(); }
+	[[nodiscard]] double openaiPresencePenalty() const { return _openaiPresencePenalty.current(); }
+	[[nodiscard]] double openaiFrequencyPenalty() const { return _openaiFrequencyPenalty.current(); }
+	[[nodiscard]] const QString &openaiSystemPrompt() const { return _openaiSystemPrompt.current(); }
 	[[nodiscard]] bool adaptiveCoverColor() const { return _adaptiveCoverColor.current(); }
 	[[nodiscard]] bool improveLinkPreviews() const { return _improveLinkPreviews.current(); }
 	[[nodiscard]] bool crashReporting() const { return _crashReporting.current(); }
@@ -400,6 +417,19 @@ public:
 	void setGifConfirmation(bool val);
 	void setVoiceConfirmation(bool val);
 	void setTranslationProvider(TranslationProvider val);
+	void setDeeplApiBaseUrl(const QString &val);
+	void setDeeplApiKey(const QString &val);
+	void setOpenaiApiBaseUrl(const QString &val);
+	void setOpenaiApiKey(const QString &val);
+	void setOpenaiModel(const QString &val);
+	void setOpenaiAuthHeader(const QString &val);
+	void setOpenaiAuthPrefix(const QString &val);
+	void setOpenaiTemperature(double val);
+	void setOpenaiMaxTokens(int val);
+	void setOpenaiTopP(double val);
+	void setOpenaiPresencePenalty(double val);
+	void setOpenaiFrequencyPenalty(double val);
+	void setOpenaiSystemPrompt(const QString &val);
 	void setAdaptiveCoverColor(bool val);
 	void setImproveLinkPreviews(bool val);
 	void setCrashReporting(bool val);
@@ -653,6 +683,21 @@ private:
 	rpl::variable<bool> _gifConfirmation = false;
 	rpl::variable<bool> _voiceConfirmation = false;
 	rpl::variable<TranslationProvider> _translationProvider = TranslationProvider::Telegram;
+	rpl::variable<QString> _deeplApiBaseUrl = QString("https://api-free.deepl.com/v2");
+	rpl::variable<QString> _deeplApiKey;
+	rpl::variable<QString> _openaiApiBaseUrl = QString("https://api.openai.com/v1");
+	rpl::variable<QString> _openaiApiKey;
+	rpl::variable<QString> _openaiModel = QString("gpt-4o-mini");
+	rpl::variable<QString> _openaiAuthHeader = QString("Authorization");
+	rpl::variable<QString> _openaiAuthPrefix = QString("Bearer ");
+	rpl::variable<double> _openaiTemperature = 0.2;
+	rpl::variable<int> _openaiMaxTokens = 1024;
+	rpl::variable<double> _openaiTopP = 1.0;
+	rpl::variable<double> _openaiPresencePenalty = 0.0;
+	rpl::variable<double> _openaiFrequencyPenalty = 0.0;
+	rpl::variable<QString> _openaiSystemPrompt = QString(
+		"You are a translation engine. Translate text from {source_lang} to {target_lang}. "
+		"Preserve meaning, formatting, line breaks, and any HTML tags. Reply with the translation only.");
 	rpl::variable<bool> _adaptiveCoverColor = true;
 	rpl::variable<bool> _improveLinkPreviews = false;
 	rpl::variable<bool> _crashReporting = true;

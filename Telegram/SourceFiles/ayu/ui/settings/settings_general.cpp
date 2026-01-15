@@ -35,15 +35,19 @@ void BuildTranslator(SectionBuilder &builder, AyuSectionBuilder &ayu) {
 	builder.addSubsectionTitle(tr::lng_translate_settings_subtitle());
 
 	auto *settings = &AyuSettings::getInstance();
+	const auto controller = builder.controller();
 
 	const auto options = std::vector{
 		QString("Telegram"),
 		QString("Google"),
-		QString("Yandex")
+		QString("Yandex"),
+		QString("DeepL"),
+		QString("OpenAI")
 	};
 
 	const auto getIndex = [=](TranslationProvider val) {
-		return static_cast<int>(val);
+		const auto index = static_cast<int>(val);
+		return (index >= 0 && index < static_cast<int>(options.size())) ? index : 0;
 	};
 
 	auto currentVal = AyuSettings::getInstance().translationProviderValue()
@@ -63,19 +67,181 @@ void BuildTranslator(SectionBuilder &builder, AyuSectionBuilder &ayu) {
 							AyuSettings::getInstance().setTranslationProvider(
 								static_cast<TranslationProvider>(index));
 						};
-						SingleChoiceBox(box, {
-							.title = tr::ayu_TranslationProvider(),
-							.options = options,
-							.initialSelection = getIndex(settings->translationProvider()),
-							.callback = save,
-						});
-					}));
-			}
-		},
-	});
+							SingleChoiceBox(box, {
+								.title = tr::ayu_TranslationProvider(),
+								.options = options,
+								.initialSelection = getIndex(settings->translationProvider()),
+								.callback = save,
+							});
+						}));
+				}
+			},
+		});
 	if (button) {
 		ayu.addBetaBadge(button);
 	}
+
+	const auto deeplStatus = settings->deeplApiKey().trimmed().isEmpty()
+		? QString("Not set")
+		: QString("Configured");
+	builder.addButton({
+		.id = u"ayu/deeplApi"_q,
+		.title = rpl::single(QString("DeepL API")),
+		.st = &st::settingsButtonNoIcon,
+		.label = rpl::single(deeplStatus),
+		.onClick = [=] {
+			controller->show(Box([=](not_null<Ui::GenericBox*> box) {
+				box->setTitle(rpl::single(QString("DeepL API")));
+
+				const auto addField = [&](const QString &placeholder, const QString &value, Ui::InputField::Mode mode) {
+					const auto field = box->addRow(
+						object_ptr<Ui::InputField>(
+							box->verticalLayout(),
+							st::defaultInputField,
+							mode,
+							rpl::single(placeholder)),
+						st::boxRowPadding);
+					field->setText(value);
+					return field;
+				};
+
+				const auto baseField = addField(
+					QString("API Base URL"),
+					settings->deeplApiBaseUrl(),
+					Ui::InputField::Mode::SingleLine);
+				const auto keyField = addField(
+					QString("API Key"),
+					settings->deeplApiKey(),
+					Ui::InputField::Mode::SingleLine);
+
+				box->addButton(tr::lng_settings_save(), [=] {
+					auto baseUrl = baseField->getLastText().trimmed();
+					if (baseUrl.isEmpty()) {
+						baseUrl = QString("https://api-free.deepl.com/v2");
+					}
+					auto &current = AyuSettings::getInstance();
+					current.setDeeplApiBaseUrl(baseUrl);
+					current.setDeeplApiKey(keyField->getLastText().trimmed());
+					box->closeBox();
+				});
+				box->addButton(tr::lng_cancel(), [=] { box->closeBox(); });
+			}));
+		},
+	});
+
+	const auto openaiStatus = settings->openaiApiKey().trimmed().isEmpty()
+		? QString("Not set")
+		: QString("Configured");
+	builder.addButton({
+		.id = u"ayu/openaiApi"_q,
+		.title = rpl::single(QString("OpenAI API")),
+		.st = &st::settingsButtonNoIcon,
+		.label = rpl::single(openaiStatus),
+		.onClick = [=] {
+			controller->show(Box([=](not_null<Ui::GenericBox*> box) {
+				box->setTitle(rpl::single(QString("OpenAI API")));
+
+				const auto addField = [&](const QString &placeholder, const QString &value, Ui::InputField::Mode mode) {
+					const auto field = box->addRow(
+						object_ptr<Ui::InputField>(
+							box->verticalLayout(),
+							st::defaultInputField,
+							mode,
+							rpl::single(placeholder)),
+						st::boxRowPadding);
+					field->setText(value);
+					return field;
+				};
+
+				const auto baseField = addField(
+					QString("API Base URL"),
+					settings->openaiApiBaseUrl(),
+					Ui::InputField::Mode::SingleLine);
+				const auto keyField = addField(
+					QString("API Token"),
+					settings->openaiApiKey(),
+					Ui::InputField::Mode::SingleLine);
+				const auto modelField = addField(
+					QString("Model"),
+					settings->openaiModel(),
+					Ui::InputField::Mode::SingleLine);
+				const auto authHeaderField = addField(
+					QString("Auth Header"),
+					settings->openaiAuthHeader(),
+					Ui::InputField::Mode::SingleLine);
+				const auto authPrefixField = addField(
+					QString("Auth Prefix"),
+					settings->openaiAuthPrefix(),
+					Ui::InputField::Mode::SingleLine);
+				const auto temperatureField = addField(
+					QString("Temperature"),
+					QString::number(settings->openaiTemperature()),
+					Ui::InputField::Mode::SingleLine);
+				const auto maxTokensField = addField(
+					QString("Max Tokens"),
+					QString::number(settings->openaiMaxTokens()),
+					Ui::InputField::Mode::SingleLine);
+				const auto topPField = addField(
+					QString("Top P"),
+					QString::number(settings->openaiTopP()),
+					Ui::InputField::Mode::SingleLine);
+				const auto presencePenaltyField = addField(
+					QString("Presence Penalty"),
+					QString::number(settings->openaiPresencePenalty()),
+					Ui::InputField::Mode::SingleLine);
+				const auto frequencyPenaltyField = addField(
+					QString("Frequency Penalty"),
+					QString::number(settings->openaiFrequencyPenalty()),
+					Ui::InputField::Mode::SingleLine);
+				const auto promptField = addField(
+					QString("System Prompt"),
+					settings->openaiSystemPrompt(),
+					Ui::InputField::Mode::MultiLine);
+
+				box->addButton(tr::lng_settings_save(), [=] {
+					auto &current = AyuSettings::getInstance();
+					auto baseUrl = baseField->getLastText().trimmed();
+					if (baseUrl.isEmpty()) {
+						baseUrl = QString("https://api.openai.com/v1");
+					}
+					current.setOpenaiApiBaseUrl(baseUrl);
+					current.setOpenaiApiKey(keyField->getLastText().trimmed());
+					current.setOpenaiModel(modelField->getLastText().trimmed());
+					current.setOpenaiAuthHeader(authHeaderField->getLastText().trimmed());
+					current.setOpenaiAuthPrefix(authPrefixField->getLastText());
+
+					bool ok = false;
+					const auto temperature = temperatureField->getLastText().trimmed().toDouble(&ok);
+					if (ok) {
+						current.setOpenaiTemperature(temperature);
+					}
+					ok = false;
+					const auto maxTokens = maxTokensField->getLastText().trimmed().toInt(&ok);
+					if (ok) {
+						current.setOpenaiMaxTokens(maxTokens);
+					}
+					ok = false;
+					const auto topP = topPField->getLastText().trimmed().toDouble(&ok);
+					if (ok) {
+						current.setOpenaiTopP(topP);
+					}
+					ok = false;
+					const auto presencePenalty = presencePenaltyField->getLastText().trimmed().toDouble(&ok);
+					if (ok) {
+						current.setOpenaiPresencePenalty(presencePenalty);
+					}
+					ok = false;
+					const auto frequencyPenalty = frequencyPenaltyField->getLastText().trimmed().toDouble(&ok);
+					if (ok) {
+						current.setOpenaiFrequencyPenalty(frequencyPenalty);
+					}
+					current.setOpenaiSystemPrompt(promptField->getLastText());
+					box->closeBox();
+				});
+				box->addButton(tr::lng_cancel(), [=] { box->closeBox(); });
+			}));
+		},
+	});
 }
 
 void BuildShowPeerId(SectionBuilder &builder) {

@@ -471,7 +471,11 @@ void AyuSettings::validate() {
 	validateEnum(_showRepeatMessageInContextMenu, defaults._showRepeatMessageInContextMenu);
 	validateEnum(_showAddFilterInContextMenu, defaults._showAddFilterInContextMenu);
 
-	validateEnum(_translationProvider, defaults._translationProvider);
+	const auto translationProvider = static_cast<int>(_translationProvider.current());
+	if (translationProvider < 0 || translationProvider > static_cast<int>(TranslationProvider::OpenAI)) {
+		_translationProvider = defaults._translationProvider.current();
+		modified = true;
+	}
 
 	validateRange(_wideMultiplier, 0.5, 4.0, defaults._wideMultiplier);
 	validateRange(_recentStickersCount, 1, 200, defaults._recentStickersCount);
@@ -952,6 +956,90 @@ void AyuSettings::setTranslationProvider(TranslationProvider val) {
 	save();
 }
 
+void AyuSettings::setDeeplApiBaseUrl(const QString &val) {
+	const auto normalized = val.trimmed();
+	if (_deeplApiBaseUrl.current() == normalized) return;
+	_deeplApiBaseUrl = normalized;
+	save();
+}
+
+void AyuSettings::setDeeplApiKey(const QString &val) {
+	const auto normalized = val.trimmed();
+	if (_deeplApiKey.current() == normalized) return;
+	_deeplApiKey = normalized;
+	save();
+}
+
+void AyuSettings::setOpenaiApiBaseUrl(const QString &val) {
+	const auto normalized = val.trimmed();
+	if (_openaiApiBaseUrl.current() == normalized) return;
+	_openaiApiBaseUrl = normalized;
+	save();
+}
+
+void AyuSettings::setOpenaiApiKey(const QString &val) {
+	const auto normalized = val.trimmed();
+	if (_openaiApiKey.current() == normalized) return;
+	_openaiApiKey = normalized;
+	save();
+}
+
+void AyuSettings::setOpenaiModel(const QString &val) {
+	const auto normalized = val.trimmed();
+	if (_openaiModel.current() == normalized) return;
+	_openaiModel = normalized;
+	save();
+}
+
+void AyuSettings::setOpenaiAuthHeader(const QString &val) {
+	const auto normalized = val.trimmed();
+	if (_openaiAuthHeader.current() == normalized) return;
+	_openaiAuthHeader = normalized;
+	save();
+}
+
+void AyuSettings::setOpenaiAuthPrefix(const QString &val) {
+	if (_openaiAuthPrefix.current() == val) return;
+	_openaiAuthPrefix = val;
+	save();
+}
+
+void AyuSettings::setOpenaiTemperature(double val) {
+	if (_openaiTemperature.current() == val) return;
+	_openaiTemperature = val;
+	save();
+}
+
+void AyuSettings::setOpenaiMaxTokens(int val) {
+	if (_openaiMaxTokens.current() == val) return;
+	_openaiMaxTokens = (val < 0) ? 0 : val;
+	save();
+}
+
+void AyuSettings::setOpenaiTopP(double val) {
+	if (_openaiTopP.current() == val) return;
+	_openaiTopP = val;
+	save();
+}
+
+void AyuSettings::setOpenaiPresencePenalty(double val) {
+	if (_openaiPresencePenalty.current() == val) return;
+	_openaiPresencePenalty = val;
+	save();
+}
+
+void AyuSettings::setOpenaiFrequencyPenalty(double val) {
+	if (_openaiFrequencyPenalty.current() == val) return;
+	_openaiFrequencyPenalty = val;
+	save();
+}
+
+void AyuSettings::setOpenaiSystemPrompt(const QString &val) {
+	if (_openaiSystemPrompt.current() == val) return;
+	_openaiSystemPrompt = val;
+	save();
+}
+
 void AyuSettings::setAdaptiveCoverColor(bool val) {
 	if (_adaptiveCoverColor.current() == val) return;
 	_adaptiveCoverColor = val;
@@ -1064,13 +1152,26 @@ void to_json(nlohmann::json &j, const AyuSettings &s) {
 		{"showMessageSeconds", s._showMessageSeconds.current()},
 		{"showMessageShot", s._showMessageShot.current()},
 		{"filterZalgo", s._filterZalgo.current()},
-		{"stickerConfirmation", s._stickerConfirmation.current()},
-		{"gifConfirmation", s._gifConfirmation.current()},
-		{"voiceConfirmation", s._voiceConfirmation.current()},
-		{"translationProvider", s._translationProvider.current()},
-		{"adaptiveCoverColor", s._adaptiveCoverColor.current()},
-		{"improveLinkPreviews", s._improveLinkPreviews.current()},
-		{"crashReporting", s._crashReporting.current()},
+			{"stickerConfirmation", s._stickerConfirmation.current()},
+			{"gifConfirmation", s._gifConfirmation.current()},
+			{"voiceConfirmation", s._voiceConfirmation.current()},
+			{"translationProvider", s._translationProvider.current()},
+			{"deeplApiBaseUrl", s._deeplApiBaseUrl.current()},
+			{"deeplApiKey", s._deeplApiKey.current()},
+			{"openaiApiBaseUrl", s._openaiApiBaseUrl.current()},
+			{"openaiApiKey", s._openaiApiKey.current()},
+			{"openaiModel", s._openaiModel.current()},
+			{"openaiAuthHeader", s._openaiAuthHeader.current()},
+			{"openaiAuthPrefix", s._openaiAuthPrefix.current()},
+			{"openaiTemperature", s._openaiTemperature.current()},
+			{"openaiMaxTokens", s._openaiMaxTokens.current()},
+			{"openaiTopP", s._openaiTopP.current()},
+			{"openaiPresencePenalty", s._openaiPresencePenalty.current()},
+			{"openaiFrequencyPenalty", s._openaiFrequencyPenalty.current()},
+			{"openaiSystemPrompt", s._openaiSystemPrompt.current()},
+			{"adaptiveCoverColor", s._adaptiveCoverColor.current()},
+			{"improveLinkPreviews", s._improveLinkPreviews.current()},
+			{"crashReporting", s._crashReporting.current()},
 		{"avatarCorners", s._avatarCorners.current()},
 		{"singleCornerRadius", s._singleCornerRadius.current()},
 		{"messageShotSettings", s._messageShotSettings}
@@ -1165,6 +1266,19 @@ void from_json(const nlohmann::json &j, AyuSettings &s) {
 	s._gifConfirmation = j.value("gifConfirmation", defaults._gifConfirmation.current());
 	s._voiceConfirmation = j.value("voiceConfirmation", defaults._voiceConfirmation.current());
 	s._translationProvider = j.value("translationProvider", defaults._translationProvider.current());
+	s._deeplApiBaseUrl = j.value("deeplApiBaseUrl", defaults._deeplApiBaseUrl.current());
+	s._deeplApiKey = j.value("deeplApiKey", defaults._deeplApiKey.current());
+	s._openaiApiBaseUrl = j.value("openaiApiBaseUrl", defaults._openaiApiBaseUrl.current());
+	s._openaiApiKey = j.value("openaiApiKey", defaults._openaiApiKey.current());
+	s._openaiModel = j.value("openaiModel", defaults._openaiModel.current());
+	s._openaiAuthHeader = j.value("openaiAuthHeader", defaults._openaiAuthHeader.current());
+	s._openaiAuthPrefix = j.value("openaiAuthPrefix", defaults._openaiAuthPrefix.current());
+	s._openaiTemperature = j.value("openaiTemperature", defaults._openaiTemperature.current());
+	s._openaiMaxTokens = j.value("openaiMaxTokens", defaults._openaiMaxTokens.current());
+	s._openaiTopP = j.value("openaiTopP", defaults._openaiTopP.current());
+	s._openaiPresencePenalty = j.value("openaiPresencePenalty", defaults._openaiPresencePenalty.current());
+	s._openaiFrequencyPenalty = j.value("openaiFrequencyPenalty", defaults._openaiFrequencyPenalty.current());
+	s._openaiSystemPrompt = j.value("openaiSystemPrompt", defaults._openaiSystemPrompt.current());
 	s._adaptiveCoverColor = j.value("adaptiveCoverColor", defaults._adaptiveCoverColor.current());
 	s._improveLinkPreviews = j.value("improveLinkPreviews", defaults._improveLinkPreviews.current());
 	s._crashReporting = j.value("crashReporting", defaults._crashReporting.current());

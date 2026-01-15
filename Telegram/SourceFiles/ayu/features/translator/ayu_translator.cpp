@@ -8,7 +8,9 @@
 
 #include "api/api_text_entities.h"
 #include "ayu/ayu_settings.h"
+#include "ayu/features/translator/implementations/deepl.h"
 #include "ayu/features/translator/implementations/google.h"
+#include "ayu/features/translator/implementations/openai.h"
 #include "ayu/features/translator/implementations/telegram.h"
 #include "ayu/features/translator/implementations/yandex.h"
 #include "data/data_peer.h"
@@ -34,6 +36,10 @@ BaseTranslator &translatorForProvider(TranslationProvider provider) {
 		return YandexTranslator::instance();
 	case TranslationProvider::Google:
 		return GoogleTranslator::instance();
+	case TranslationProvider::DeepL:
+		return DeepLTranslator::instance();
+	case TranslationProvider::OpenAI:
+		return OpenAITranslator::instance();
 	}
 	return GoogleTranslator::instance();
 }
