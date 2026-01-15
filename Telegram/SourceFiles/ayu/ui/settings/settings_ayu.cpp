@@ -594,7 +594,7 @@ const auto kMeta = BuildHelper({
 } // namespace
 
 rpl::producer<QString> AyuGhost::title() {
-	return rpl::single(QString("AyuGram"));
+	return rpl::single(QString("Telegram"));
 }
 
 AyuGhost::AyuGhost(

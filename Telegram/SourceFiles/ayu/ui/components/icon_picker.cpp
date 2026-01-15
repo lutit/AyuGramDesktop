@@ -22,6 +22,7 @@
 namespace {
 
 const QVector<QString> icons{
+	AyuAssets::TELEGRAM_ICON,
 	AyuAssets::DEFAULT_ICON,
 	AyuAssets::ALT_ICON,
 	AyuAssets::DISCORD_ICON,

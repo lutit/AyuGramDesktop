@@ -68,12 +68,12 @@ void BuildVersionInfo(SectionBuilder &builder) {
 	builder.add([](const WidgetContext &ctx) -> SectionBuilder::WidgetToAdd {
 		return {
 			.widget = object_ptr<Ui::FlatLabel>(
-				ctx.container,
-				rpl::single(
-					QString("AyuGram Desktop v")
-					+ QString::fromLatin1(AppVersionStr)),
-				st::boxTitle),
-			.align = style::al_top,
+					ctx.container,
+					rpl::single(
+						QString("Telegram Desktop v")
+						+ QString::fromLatin1(AppVersionStr)),
+					st::boxTitle),
+				.align = style::al_top,
 		};
 	});
 
@@ -101,7 +101,7 @@ void BuildCategories(SectionBuilder &builder) {
 	builder.addSubsectionTitle(tr::ayu_CategoriesHeader());
 
 	builder.addSectionButton({
-		.title = rpl::single(QString("AyuGram")),
+		.title = rpl::single(QString("Telegram")),
 		.targetSection = AyuGhost::Id(),
 		.icon = { &st::menuIconGroupReactions },
 	});
