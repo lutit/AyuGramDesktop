@@ -1,9 +1,9 @@
-#define MyAppShortName "AyuGram"
-#define MyAppName "AyuGram Desktop"
-#define MyAppPublisher "Radolyn Labs"
-#define MyAppURL "https://github.com/AyuGram"
-#define MyAppExeName "AyuGram.exe"
-#define MyAppId "53F49750-6209-4FBF-9CA8-7A333C87D666"
+#define MyAppShortName "Telegram"
+#define MyAppName "Telegram Desktop"
+#define MyAppPublisher "Telegram FZ-LLC"
+#define MyAppURL "https://desktop.telegram.org"
+#define MyAppExeName "Telegram.exe"
+#define MyAppId "53F49750-6209-4FBF-9CA8-7A333C87D1ED"
 #define CurrentYear GetDateTimeString('yyyy','','')
 
 [Setup]
@@ -44,11 +44,11 @@ SignTool=sha256
 #elif MyBuildTarget == "win64"
   ArchitecturesAllowed="x64compatible"
   ArchitecturesInstallIn64BitMode="x64compatible"
-  OutputBaseFilename=ayusetup-x64.{#MyAppVersionFull}
+  OutputBaseFilename=tsetup-x64.{#MyAppVersionFull}
   #define ArchModulesFolder "x64"
   AppVerName={#MyAppName} {#MyAppVersion} 64bit
 #else
-  OutputBaseFilename=ayusetup.{#MyAppVersionFull}
+  OutputBaseFilename=tsetup.{#MyAppVersionFull}
   #define ArchModulesFolder "x86"
   AppVerName={#MyAppName} {#MyAppVersion} 32bit
 #endif

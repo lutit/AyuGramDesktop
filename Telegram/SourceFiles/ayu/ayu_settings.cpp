@@ -144,7 +144,7 @@ void postinitialize() {
 	ghostModeEnabled = ghostModeEnabled_util(settings.value());
 
 	if (settings->appIcon == QString("macos")) {
-		settings->appIcon = AyuAssets::DEFAULT_ICON;
+		settings->appIcon = AyuAssets::TELEGRAM_ICON;
 	}
 }
 
@@ -258,7 +258,7 @@ AyuGramSettings::AyuGramSettings() {
 	showGroupReactions = true;
 
 	// ~ Customization
-	appIcon = AyuAssets::DEFAULT_ICON;
+	appIcon = AyuAssets::TELEGRAM_ICON;
 	simpleQuotesAndReplies = false;
 	hideFastShare = false;
 	replaceBottomInfoWithIcons = true;

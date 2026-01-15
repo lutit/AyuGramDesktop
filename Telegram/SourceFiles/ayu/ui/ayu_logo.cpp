@@ -22,7 +22,7 @@ void loadAppIco() {
 	const auto &settings = AyuSettings::getInstance();
 
 	QString appDataPath = QDir::fromNativeSeparators(qgetenv("APPDATA"));
-	QString tempIconPath = appDataPath + "/AyuGram.ico";
+	QString tempIconPath = appDataPath + "/Telegram.ico";
 
 	// workaround for read-only file
 	auto f = QFile(tempIconPath);

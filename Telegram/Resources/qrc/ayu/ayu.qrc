@@ -10,6 +10,8 @@
         <file alias="art/ayu/chibi2/app_icon.ico">../../art/ayu/chibi2/app_icon.ico</file>
         <file alias="art/ayu/default/app.svg">../../art/ayu/default/app.svg</file>
         <file alias="art/ayu/default/app_icon.ico">../../art/ayu/default/app_icon.ico</file>
+        <file alias="art/ayu/telegram/app.png">../../art/ayu/telegram/app.png</file>
+        <file alias="art/ayu/telegram/app_icon.ico">../../art/ayu/telegram/app_icon.ico</file>
         <file alias="art/ayu/discord/app.svg">../../art/ayu/discord/app.svg</file>
         <file alias="art/ayu/discord/app_icon.ico">../../art/ayu/discord/app_icon.ico</file>
         <file alias="art/ayu/extera/app.svg">../../art/ayu/extera/app.svg</file>

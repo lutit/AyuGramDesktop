@@ -86,7 +86,7 @@ void SetupCategories(
 	};
 
 	const auto categories = std::vector<CategoryInfo>{
-		{QString("AyuGram"), &st::menuIconGroupReactions, [=] { showOther(AyuGhost::Id()); }},
+		{QString("Telegram"), &st::menuIconGroupReactions, [=] { showOther(AyuGhost::Id()); }},
 		{asBeta(tr::ayu_CategoryFilters(tr::now)), &st::menuIconTagFilter, [=] { showOther(AyuFilters::Id()); }},
 		{tr::ayu_CategoryGeneral(tr::now), &st::menuIconShowAll, [=] { showOther(AyuGeneral::Id()); }},
 		{tr::ayu_CategoryAppearance(tr::now), &st::menuIconPalette, [=] { showOther(AyuAppearance::Id()); }},
@@ -119,7 +119,7 @@ void AyuMain::setupContent(not_null<Window::SessionController*> controller) {
 	content->add(
 		object_ptr<Ui::FlatLabel>(
 			content,
-			rpl::single(QString("AyuGram Desktop v") + QString::fromLatin1(AppVersionStr)),
+			rpl::single(QString("Telegram Desktop v") + QString::fromLatin1(AppVersionStr)),
 			st::boxTitle),
 		style::al_top);
 
