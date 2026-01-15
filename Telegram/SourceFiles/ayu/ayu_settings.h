@@ -145,6 +145,19 @@ public:
 	bool voiceConfirmation;
 
 	QString translationProvider;
+	QString deeplApiBaseUrl;
+	QString deeplApiKey;
+	QString openaiApiBaseUrl;
+	QString openaiApiKey;
+	QString openaiModel;
+	QString openaiAuthHeader;
+	QString openaiAuthPrefix;
+	double openaiTemperature;
+	int openaiMaxTokens;
+	double openaiTopP;
+	double openaiPresencePenalty;
+	double openaiFrequencyPenalty;
+	QString openaiSystemPrompt;
 
 	bool adaptiveCoverColor;
 
@@ -337,6 +350,19 @@ inline void to_json(nlohmann::json &nlohmann_json_j, const AyuGramSettings &nloh
 	NLOHMANN_JSON_TO(gifConfirmation)
 	NLOHMANN_JSON_TO(voiceConfirmation)
 	NLOHMANN_JSON_TO(translationProvider)
+	NLOHMANN_JSON_TO(deeplApiBaseUrl)
+	NLOHMANN_JSON_TO(deeplApiKey)
+	NLOHMANN_JSON_TO(openaiApiBaseUrl)
+	NLOHMANN_JSON_TO(openaiApiKey)
+	NLOHMANN_JSON_TO(openaiModel)
+	NLOHMANN_JSON_TO(openaiAuthHeader)
+	NLOHMANN_JSON_TO(openaiAuthPrefix)
+	NLOHMANN_JSON_TO(openaiTemperature)
+	NLOHMANN_JSON_TO(openaiMaxTokens)
+	NLOHMANN_JSON_TO(openaiTopP)
+	NLOHMANN_JSON_TO(openaiPresencePenalty)
+	NLOHMANN_JSON_TO(openaiFrequencyPenalty)
+	NLOHMANN_JSON_TO(openaiSystemPrompt)
 	NLOHMANN_JSON_TO(adaptiveCoverColor)
 	NLOHMANN_JSON_TO(crashReporting)
 }
@@ -422,6 +448,19 @@ inline void from_json(const nlohmann::json &nlohmann_json_j, AyuGramSettings &nl
 	NLOHMANN_JSON_FROM_WITH_DEFAULT(gifConfirmation)
 	NLOHMANN_JSON_FROM_WITH_DEFAULT(voiceConfirmation)
 	NLOHMANN_JSON_FROM_WITH_DEFAULT(translationProvider)
+	NLOHMANN_JSON_FROM_WITH_DEFAULT(deeplApiBaseUrl)
+	NLOHMANN_JSON_FROM_WITH_DEFAULT(deeplApiKey)
+	NLOHMANN_JSON_FROM_WITH_DEFAULT(openaiApiBaseUrl)
+	NLOHMANN_JSON_FROM_WITH_DEFAULT(openaiApiKey)
+	NLOHMANN_JSON_FROM_WITH_DEFAULT(openaiModel)
+	NLOHMANN_JSON_FROM_WITH_DEFAULT(openaiAuthHeader)
+	NLOHMANN_JSON_FROM_WITH_DEFAULT(openaiAuthPrefix)
+	NLOHMANN_JSON_FROM_WITH_DEFAULT(openaiTemperature)
+	NLOHMANN_JSON_FROM_WITH_DEFAULT(openaiMaxTokens)
+	NLOHMANN_JSON_FROM_WITH_DEFAULT(openaiTopP)
+	NLOHMANN_JSON_FROM_WITH_DEFAULT(openaiPresencePenalty)
+	NLOHMANN_JSON_FROM_WITH_DEFAULT(openaiFrequencyPenalty)
+	NLOHMANN_JSON_FROM_WITH_DEFAULT(openaiSystemPrompt)
 	NLOHMANN_JSON_FROM_WITH_DEFAULT(adaptiveCoverColor)
 	NLOHMANN_JSON_FROM_WITH_DEFAULT(crashReporting)
 }

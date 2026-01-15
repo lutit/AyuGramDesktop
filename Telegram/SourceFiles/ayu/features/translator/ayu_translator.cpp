@@ -19,6 +19,8 @@
 #include "implementations/google.h"
 #include "implementations/telegram.h"
 #include "implementations/yandex.h"
+#include "implementations/deepl.h"
+#include "implementations/openai.h"
 #include "main/main_session.h"
 
 // todo: expose available languages from current translator and use in `ChooseTranslateToBox`
@@ -232,8 +234,14 @@ mtpRequestId TranslateManager::performTranslation(Builder &req) {
 			it->second.cancel = TelegramTranslator::instance().startTranslation(args);
 		} else if (settings.translationProvider == "yandex") {
 			it->second.cancel = YandexTranslator::instance().startTranslation(args);
-		} else {
+		} else if (settings.translationProvider == "google") {
 			it->second.cancel = GoogleTranslator::instance().startTranslation(args);
+		} else if (settings.translationProvider == "deepl") {
+			it->second.cancel = DeepLTranslator::instance().startTranslation(args);
+		} else if (settings.translationProvider == "openai") {
+			it->second.cancel = OpenAITranslator::instance().startTranslation(args);
+		} else {
+			it->second.cancel = TelegramTranslator::instance().startTranslation(args);
 		}
 	}
 
