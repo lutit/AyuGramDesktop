@@ -20,6 +20,7 @@
 #include "ui/vertical_list.h"
 #include "ui/boxes/single_choice_box.h"
 #include "ui/widgets/buttons.h"
+#include "ui/widgets/fields/input_field.h"
 #include "ui/wrap/vertical_layout.h"
 #include "window/window_controller.h"
 #include "window/window_session_controller.h"
