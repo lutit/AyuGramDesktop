@@ -10,13 +10,6 @@
 #include <qjsondocument.h>
 #include <QTimer>
 
-namespace {
-
-constexpr auto kPrimaryUrl = "https://update.ayugram.one/rc/current/desktop2";
-constexpr auto kExteraUrl = "https://api.exteragram.app/api/v1/profiles/compact";
-
-}
-
 std::unordered_set<ID> default_developers = {};
 std::unordered_set<ID> default_channels = {};
 
@@ -35,41 +28,11 @@ void RCManager::makeRequest() {
 }
 
 void RCManager::sendRequest() {
-	if (!_manager) {
-		return;
-	}
-
-	const auto url = QString::fromLatin1(_useExteraFallback ? kExteraUrl : kPrimaryUrl);
-	LOG(("RCManager: requesting map"));
-
-	clearSentRequest();
-
-	auto request = QNetworkRequest(QUrl(url));
-	request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
-	_reply = _manager->get(request);
-	connect(_reply,
-			&QNetworkReply::finished,
-			[=]
-			{
-				gotResponse();
-			});
-	connect(_reply,
-			&QNetworkReply::errorOccurred,
-			[=](auto e)
-			{
-				gotFailure(e);
-			});
+	return;
 }
 
 bool RCManager::tryRetryWithExteraFallback() {
-	if (_retryAttempted || _useExteraFallback) {
-		return false;
-	}
-	LOG(("RCManager: switching to extera fallback endpoint"));
-	_useExteraFallback = true;
-	_retryAttempted = true;
-	sendRequest();
-	return true;
+	return false;
 }
 
 void RCManager::gotResponse() {
