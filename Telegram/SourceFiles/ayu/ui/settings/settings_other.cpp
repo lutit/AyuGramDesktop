@@ -44,10 +44,9 @@ struct Asset {
 };
 
 Asset getAsset(const QString &name) {
-	const auto isNightMode = Window::Theme::IsNightMode();
 	const auto normalized = name.toLower();
 	QString icon = QString(":/gui/icons/ayu/donates/%1.svg").arg(normalized);
-	QColor background = isNightMode ? QColor(0xEEEEEE) : QColor(0x242B2C);
+	QColor background = QColor(0x242B2C);
 	return {
 		.icon = std::move(icon),
 		.background = std::move(background)
@@ -70,11 +69,11 @@ QImage getImage(const QString &name) {
 
 		p.setPen(Qt::NoPen);
 		p.setBrush(iconData.background);
-		p.drawRoundedRect(Rect(size), size.width() / 4., size.height() / 4.);
+		p.drawRoundedRect(QRect(0, 0, size.width(), size.height()), size.width() / 4., size.height() / 4.);
 		p.setBrush(Qt::transparent);
 
 		auto svgIcon = QSvgRenderer(iconData.icon);
-		svgIcon.render(&p, Rect(size));
+		svgIcon.render(&p, QRect(0, 0, size.width(), size.height()));
 	}
 
 	return image;
@@ -85,8 +84,7 @@ QImage getImage(const QString &name) {
 		const QString &name) {
 	const auto btnContainer = Ui::CreateChild<Ui::RpWidget>(button);
 	const auto &buttonSt = button->st();
-	const auto fullHeight = buttonSt.height
-		+ rect::m::sum::v(buttonSt.padding);
+	const auto fullHeight = buttonSt.height;
 
 	const auto iconWidget = Ui::CreateChild<Ui::RpWidget>(button.get());
 
