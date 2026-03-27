@@ -53,7 +53,7 @@ constexpr auto kSecondsInYear = 365 * 24 * 60 * 60; // 31536000
 } // namespace
 
 QString TimeFormatString() {
-	if (!AyuSettings::getInstance().showMessageSeconds) {
+	if (!AyuSettings::getInstance().showMessageSeconds()) {
 		return QLocale().timeFormat(QLocale::ShortFormat);
 	}
 	const auto shortFormat = QLocale().timeFormat(QLocale::ShortFormat);
