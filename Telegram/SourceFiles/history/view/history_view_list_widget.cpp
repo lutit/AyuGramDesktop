@@ -104,6 +104,24 @@ constexpr auto kClearUserpicsAfter = 50;
 	return history ? std::make_unique<TranslateTracker>(history) : nullptr;
 }
 
+[[nodiscard]] QString CopyMessageAuthorName(not_null<HistoryItem*> item) {
+	const auto peer = item->displayFrom()
+		? item->displayFrom()
+		: item->author().get();
+	if (const auto user = peer->asUser()) {
+		const auto &first = user->firstName;
+		const auto &last = user->lastName;
+		if (!first.isEmpty() && !last.isEmpty()) {
+			return first + u" "_q + last;
+		}
+		const auto result = first.isEmpty() ? last : first;
+		if (!result.isEmpty()) {
+			return result;
+		}
+	}
+	return peer->name();
+}
+
 } // namespace
 
 WindowListDelegate::WindowListDelegate(
@@ -2619,14 +2637,15 @@ TextForMimeData ListWidget::getSelectedText() const {
 	const auto wrapItem = [&](
 			not_null<HistoryItem*> item,
 			TextForMimeData &&unwrapped) {
+		const auto name = CopyMessageAuthorName(item);
 		auto time = QString(", [%1]\n").arg(
 			Ui::FormatDateTimeLocal(ItemDateTime(item)));
 		auto part = TextForMimeData();
 		auto size = time.size()
-			+ item->author()->name().size()
+			+ name.size()
 			+ unwrapped.expanded.size();
 		part.reserve(size);
-		part.append(item->author()->name()).append(time);
+		part.append(name).append(time);
 		part.append(std::move(unwrapped));
 		texts.emplace_back(std::move(item), std::move(part));
 		fullSize += size;

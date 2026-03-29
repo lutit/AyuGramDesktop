@@ -128,6 +128,24 @@ constexpr auto kScrollDateHideTimeout = 800;
 constexpr auto kUnloadHeavyPartsPages = 2;
 constexpr auto kClearUserpicsAfter = 50;
 
+[[nodiscard]] QString CopyMessageAuthorName(not_null<HistoryItem*> item) {
+	const auto peer = item->displayFrom()
+		? item->displayFrom()
+		: item->author().get();
+	if (const auto user = peer->asUser()) {
+		const auto &first = user->firstName;
+		const auto &last = user->lastName;
+		if (!first.isEmpty() && !last.isEmpty()) {
+			return first + u" "_q + last;
+		}
+		const auto result = first.isEmpty() ? last : first;
+		if (!result.isEmpty()) {
+			return result;
+		}
+	}
+	return peer->name();
+}
+
 // Helper binary search for an item in a list that is not completely
 // above the given top of the visible area or below the given bottom of the visible area
 // is applied once for blocks list in a history and once for items list in the found block.
@@ -3637,7 +3655,7 @@ TextForMimeData HistoryInner::getSelectedText() const {
 			not_null<HistoryItem*> item,
 			TextForMimeData &&unwrapped) {
 		const auto i = texts.emplace(item->position(), Part{
-			.name = item->author()->name(),
+			.name = CopyMessageAuthorName(item),
 			.time = QString(", [%1]\n").arg(
 				Ui::FormatDateTimeLocal(ItemDateTime(item))),
 			.unwrapped = std::move(unwrapped),
