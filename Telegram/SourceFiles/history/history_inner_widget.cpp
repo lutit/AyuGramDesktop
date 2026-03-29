@@ -3644,7 +3644,6 @@ TextForMimeData HistoryInner::getSelectedText() const {
 		}).first;
 		fullSize += i->second.name.size()
 			+ i->second.time.size()
-			+ 2
 			+ i->second.unwrapped.expanded.size();
 	};
 	const auto addItem = [&](not_null<HistoryItem*> item) {
@@ -3678,7 +3677,7 @@ TextForMimeData HistoryInner::getSelectedText() const {
 	const auto sep = u"\n"_q;
 	result.reserve(fullSize + (texts.size() - 1) * sep.size());
 	for (auto i = texts.begin(), e = texts.end(); i != e;) {
-		result.append(i->second.time).append(i->second.name).append(u": "_q);
+		result.append(i->second.name).append(i->second.time);
 		result.append(std::move(i->second.unwrapped));
 		if (++i != e) {
 			result.append(sep);

@@ -2624,10 +2624,9 @@ TextForMimeData ListWidget::getSelectedText() const {
 		auto part = TextForMimeData();
 		auto size = time.size()
 			+ item->author()->name().size()
-			+ 2
 			+ unwrapped.expanded.size();
 		part.reserve(size);
-		part.append(time).append(item->author()->name()).append(u": "_q);
+		part.append(item->author()->name()).append(time);
 		part.append(std::move(unwrapped));
 		texts.emplace_back(std::move(item), std::move(part));
 		fullSize += size;
