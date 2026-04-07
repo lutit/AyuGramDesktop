@@ -160,7 +160,7 @@ void ArchiveHintBox(
 							Ui::Text::IconEmoji(&st::textMoreIconEmoji)),
 						tr::rich
 					) | rpl::map([](TextWithEntities text) {
-						return Ui::Text::Link(std::move(text), 1);
+						return tr::link(std::move(text), 1);
 					}),
 					tr::rich),
 				st::channelEarnHistoryRecipientLabel));

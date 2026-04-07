@@ -16,8 +16,8 @@
 #include "features/translator/ayu_translator.h"
 #include "main/main_domain.h"
 #include "main/main_session.h"
+#include "platform/platform_translate_provider.h"
 #include "rpl/combine.h"
-#include "ui/ayu_userpic.h"
 #include "window/window_controller.h"
 
 #include <fstream>
@@ -453,9 +453,9 @@ void AyuSettings::validate() {
 		}
 	};
 
-	auto validateEnum = [&](auto &var, const auto &defaultVar) {
+	auto validateEnum = [&](auto &var, const auto &defaultVar, int max = 2) {
 		auto intVal = static_cast<int>(var.current());
-		if (intVal < 0 || intVal > 2) {
+		if (intVal < 0 || intVal > max) {
 			var = defaultVar.current();
 			modified = true;
 		}
@@ -471,12 +471,17 @@ void AyuSettings::validate() {
 	validateEnum(_showRepeatMessageInContextMenu, defaults._showRepeatMessageInContextMenu);
 	validateEnum(_showAddFilterInContextMenu, defaults._showAddFilterInContextMenu);
 
-	const auto translationProvider = static_cast<int>(_translationProvider.current());
-	if (translationProvider < 0 || translationProvider > static_cast<int>(TranslationProvider::OpenAI)) {
+	validateEnum(
+		_translationProvider,
+		defaults._translationProvider,
+		static_cast<int>(TranslationProvider::Native));
+	if ((_translationProvider.current() == TranslationProvider::Native)
+		&& !Platform::IsTranslateProviderAvailable()) {
 		_translationProvider = defaults._translationProvider.current();
 		modified = true;
 	}
 
+	validateRange(_messageBubbleRadius, 0, 16, defaults._messageBubbleRadius);
 	validateRange(_wideMultiplier, 0.5, 4.0, defaults._wideMultiplier);
 	validateRange(_recentStickersCount, 1, 200, defaults._recentStickersCount);
 	validateRange(_avatarCorners, 0, AyuUiSettings::kMaxAvatarCorners, defaults._avatarCorners);
@@ -575,6 +580,12 @@ void AyuSettings::setCollapseSimilarChannels(bool val) {
 void AyuSettings::setHideSimilarChannels(bool val) {
 	if (_hideSimilarChannels.current() == val) return;
 	_hideSimilarChannels = val;
+	save();
+}
+
+void AyuSettings::setMessageBubbleRadius(int val) {
+	if (_messageBubbleRadius.current() == val) return;
+	_messageBubbleRadius = val;
 	save();
 }
 
@@ -769,6 +780,12 @@ void AyuSettings::setShowAutoDeleteButtonInMessageField(bool val) {
 	save();
 }
 
+void AyuSettings::setShowCocoonAiButtonInMessageField(bool val) {
+	if (_showCocoonAiButtonInMessageField.current() == val) return;
+	_showCocoonAiButtonInMessageField = val;
+	save();
+}
+
 void AyuSettings::setShowAttachPopup(bool val) {
 	if (_showAttachPopup.current() == val) return;
 	_showAttachPopup = val;
@@ -950,9 +967,15 @@ void AyuSettings::setVoiceConfirmation(bool val) {
 }
 
 void AyuSettings::setTranslationProvider(TranslationProvider val) {
+	if ((val == TranslationProvider::Native)
+		&& !Platform::IsTranslateProviderAvailable()) {
+		val = TranslationProvider::Telegram;
+	}
 	if (_translationProvider.current() == val) return;
 	_translationProvider = val;
-	Ayu::Translator::TranslateManager::currentInstance()->resetCache();
+	if (const auto manager = Ayu::Translator::TranslateManager::currentInstance()) {
+		manager->resetCache();
+	}
 	save();
 }
 
@@ -1095,6 +1118,7 @@ void to_json(nlohmann::json &j, const AyuSettings &s) {
 		{"showOnlyAddedEmojisAndStickers", s._showOnlyAddedEmojisAndStickers.current()},
 		{"collapseSimilarChannels", s._collapseSimilarChannels.current()},
 		{"hideSimilarChannels", s._hideSimilarChannels.current()},
+		{"messageBubbleRadius", s._messageBubbleRadius.current()},
 		{"disableOpenLinkWarning", s._disableOpenLinkWarning.current()},
 		{"wideMultiplier", s._wideMultiplier.current()},
 		{"spoofWebviewAsAndroid", s._spoofWebviewAsAndroid.current()},
@@ -1126,6 +1150,7 @@ void to_json(nlohmann::json &j, const AyuSettings &s) {
 		{"showEmojiButtonInMessageField", s._showEmojiButtonInMessageField.current()},
 		{"showMicrophoneButtonInMessageField", s._showMicrophoneButtonInMessageField.current()},
 		{"showAutoDeleteButtonInMessageField", s._showAutoDeleteButtonInMessageField.current()},
+		{"showCocoonAiButtonInMessageField", s._showCocoonAiButtonInMessageField.current()},
 		{"showAttachPopup", s._showAttachPopup.current()},
 		{"showEmojiPopup", s._showEmojiPopup.current()},
 		{"showMyProfileInDrawer", s._showMyProfileInDrawer.current()},
@@ -1205,6 +1230,7 @@ void from_json(const nlohmann::json &j, AyuSettings &s) {
 	s._showOnlyAddedEmojisAndStickers = j.value("showOnlyAddedEmojisAndStickers", defaults._showOnlyAddedEmojisAndStickers.current());
 	s._collapseSimilarChannels = j.value("collapseSimilarChannels", defaults._collapseSimilarChannels.current());
 	s._hideSimilarChannels = j.value("hideSimilarChannels", defaults._hideSimilarChannels.current());
+	s._messageBubbleRadius = j.value("messageBubbleRadius", defaults._messageBubbleRadius.current());
 	s._disableOpenLinkWarning = j.value("disableOpenLinkWarning", defaults._disableOpenLinkWarning.current());
 	s._wideMultiplier = j.value("wideMultiplier", defaults._wideMultiplier.current());
 	s._spoofWebviewAsAndroid = j.value("spoofWebviewAsAndroid", defaults._spoofWebviewAsAndroid.current());
@@ -1236,6 +1262,7 @@ void from_json(const nlohmann::json &j, AyuSettings &s) {
 	s._showEmojiButtonInMessageField = j.value("showEmojiButtonInMessageField", defaults._showEmojiButtonInMessageField.current());
 	s._showMicrophoneButtonInMessageField = j.value("showMicrophoneButtonInMessageField", defaults._showMicrophoneButtonInMessageField.current());
 	s._showAutoDeleteButtonInMessageField = j.value("showAutoDeleteButtonInMessageField", defaults._showAutoDeleteButtonInMessageField.current());
+	s._showCocoonAiButtonInMessageField = j.value("showCocoonAiButtonInMessageField", defaults._showCocoonAiButtonInMessageField.current());
 	s._showAttachPopup = j.value("showAttachPopup", defaults._showAttachPopup.current());
 	s._showEmojiPopup = j.value("showEmojiPopup", defaults._showEmojiPopup.current());
 	s._showMyProfileInDrawer = j.value("showMyProfileInDrawer", defaults._showMyProfileInDrawer.current());
