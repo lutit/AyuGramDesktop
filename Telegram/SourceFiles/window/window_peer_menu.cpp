@@ -130,9 +130,11 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include <QtWidgets/QApplication>
 
 // AyuGram includes
+#include "ayu/utils/telegram_helpers.h"
 #include "styles/style_ayu_icons.h"
 #include "ayu/ui/context_menu/context_menu.h"
 #include "ayu/features/forward/ayu_forward.h"
+
 
 namespace Window {
 namespace {
@@ -1764,6 +1766,7 @@ void Filler::fillContextMenuActions() {
 
 void Filler::fillHistoryActions() {
 	addToggleMuteSubmenu(true);
+	AyuUi::AddAyuGramActions(_peer, _thread, _controller, _addAction);
 	addCreateTopic();
 	addInfo();
 	AyuUi::AddJumpToBeginningAction(_peer, _thread, _controller, _addAction);
@@ -1782,7 +1785,6 @@ void Filler::fillHistoryActions() {
 	addExportChat();
 	addTranslate();
 	addReport();
-	AyuUi::AddDeletedMessagesActions(_peer, _thread, _controller, _addAction);
 	addClearHistory();
 	AyuUi::AddDeleteOwnMessagesAction(_peer, _topic, _controller, _addAction);
 	addDeleteChat();
@@ -1820,6 +1822,7 @@ void Filler::fillProfileActions() {
 }
 
 void Filler::fillRepliesActions() {
+	AyuUi::AddAyuGramActions(_peer, _thread, _controller, _addAction);
 	if (_topic) {
 		addInfo();
 		AyuUi::AddJumpToBeginningAction(_peer, _thread, _controller, _addAction);
@@ -1830,7 +1833,6 @@ void Filler::fillRepliesActions() {
 	addCreateTodoList();
 	addToggleTopicClosed();
 	addDeleteTopic();
-	AyuUi::AddDeletedMessagesActions(_peer, _thread, _controller, _addAction);
 }
 
 void Filler::fillScheduledActions() {
@@ -2524,7 +2526,7 @@ void PeerMenuBlockUserBox(
 		: v::is<ClearReply>(suggestClear)
 		? box->addRow(object_ptr<Ui::Checkbox>(
 			box,
-			tr::lng_context_delete_msg(tr::now),
+			tr::lng_blocked_list_confirm_reply(tr::now),
 			true,
 			st::defaultBoxCheckbox))
 		: nullptr;
@@ -2534,7 +2536,7 @@ void PeerMenuBlockUserBox(
 	const auto allFromUser = v::is<ClearReply>(suggestClear)
 		? box->addRow(object_ptr<Ui::Checkbox>(
 			box,
-			tr::lng_delete_all_from_user(
+			tr::lng_blocked_list_confirm_reply_all(
 				tr::now,
 				lt_user,
 				tr::bold(peer->name()),
@@ -2653,9 +2655,11 @@ object_ptr<Ui::BoxContent> PrepareChooseRecipientBox(
 				return ChooseRecipientBoxController::rowClicked(row);
 			}
 			const auto count = delegate()->peerListSelectedRowsCount();
-			if (showLockedError(row) || (count && row->peer()->isForum())) {
+			const auto forum = row->peer()->isForum();
+			const auto monoforum = row->peer()->isMonoforum();
+			if (showLockedError(row) || (count && (forum || monoforum))) {
 				return;
-			} else if (row->peer()->isForum()) {
+			} else if (forum || monoforum) {
 				ChooseRecipientBoxController::rowClicked(row);
 			} else {
 				delegate()->peerListSetRowChecked(row, !row->checked());
@@ -2671,7 +2675,9 @@ object_ptr<Ui::BoxContent> PrepareChooseRecipientBox(
 					parent,
 					row);
 			}
-			if (!row->checked() && !row->peer()->isForum()) {
+			if (!row->checked()
+				&& !row->peer()->isForum()
+				&& !row->peer()->isMonoforum()) {
 				auto menu = base::make_unique_q<Ui::PopupMenu>(
 					parent,
 					st::popupMenuWithIcons);
@@ -2956,9 +2962,11 @@ base::weak_qptr<Ui::BoxContent> ShowForwardMessagesBox(
 
 		void rowClicked(not_null<PeerListRow*> row) override final {
 			const auto count = delegate()->peerListSelectedRowsCount();
-			if (showLockedError(row) || (count && row->peer()->isForum())) {
+			const auto forum = row->peer()->isForum();
+			const auto monoforum = row->peer()->isMonoforum();
+			if (showLockedError(row) || (count && (forum || monoforum))) {
 				return;
-			} else if (!count || row->peer()->isForum()) {
+			} else if (!count || forum || monoforum) {
 				if (base::IsCtrlPressed() || base::IsShiftPressed()) {
 					delegate()->peerListSetRowChecked(row, !row->checked());
 					_selectionChanges.fire({});
@@ -2974,7 +2982,9 @@ base::weak_qptr<Ui::BoxContent> ShowForwardMessagesBox(
 		base::unique_qptr<Ui::PopupMenu> rowContextMenu(
 				QWidget *parent,
 				not_null<PeerListRow*> row) override final {
-			if (!row->checked() && !row->peer()->isForum()) {
+			if (!row->checked()
+				&& !row->peer()->isForum()
+				&& !row->peer()->isMonoforum()) {
 				auto menu = base::make_unique_q<Ui::PopupMenu>(
 					parent,
 					st::popupMenuWithIcons);
@@ -3593,6 +3603,7 @@ base::weak_qptr<Ui::BoxContent> ShowSendNowMessagesBox(
 					MTP_int(session->scheduledMessages().lookupId(item)));
 			}
 		}
+		markReadAfterAction(history);
 		session->api().request(MTPmessages_SendScheduledMessages(
 			history->peer->input(),
 			MTP_vector<MTPint>(ids)

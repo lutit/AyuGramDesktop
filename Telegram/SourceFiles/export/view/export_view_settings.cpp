@@ -887,7 +887,6 @@ void SettingsWidget::refreshButtons(
 			st::defaultBoxButton)
 		: nullptr;
 	if (start) {
-		start->setTextTransform(Ui::RoundButton::TextTransform::NoTransform);
 		start->show();
 		_startClicks = start->clicks() | rpl::to_empty;
 
@@ -903,7 +902,6 @@ void SettingsWidget::refreshButtons(
 		container.get(),
 		tr::lng_cancel(),
 		st::defaultBoxButton);
-	cancel->setTextTransform(Ui::RoundButton::TextTransform::NoTransform);
 	cancel->show();
 	_cancelClicks = cancel->clicks() | rpl::to_empty;
 

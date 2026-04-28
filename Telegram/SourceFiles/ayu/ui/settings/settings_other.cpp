@@ -28,7 +28,7 @@
 namespace Settings {
 
 using namespace Builder;
-using namespace AyBuilder;
+using namespace AyuBuilder;
 
 namespace {
 void BuildCrashReporting(SectionBuilder &builder, AyuSectionBuilder &ayu) {

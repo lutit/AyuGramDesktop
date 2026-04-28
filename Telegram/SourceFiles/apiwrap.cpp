@@ -2623,7 +2623,15 @@ void ApiWrap::refreshFileReference(
 			fail();
 		}
 	}, [&](Data::FileOriginPeerPhoto data) {
-		fail();
+		const auto peer = _session->data().peer(data.peerId);
+		if (const auto channel = peer->asChannel()) {
+			request(MTPchannels_GetFullChannel(
+				channel->inputChannel()));
+		} else if (const auto chat = peer->asChat()) {
+			request(MTPmessages_GetFullChat(chat->inputChat()));
+		} else {
+			fail();
+		}
 	}, [&](Data::FileOriginStickerSet data) {
 		const auto isRecentAttached
 			= (data.setId == Data::Stickers::CloudRecentAttachedSetId);
@@ -3656,12 +3664,6 @@ void ApiWrap::forwardMessages(
 					shared->callback();
 				}
 
-				const auto &ghost = AyuSettings::ghost(_session);
-				if (!ghost.sendReadMessages() && ghost.markReadAfterAction() && history->lastMessage())
-				{
-					readHistory(history->lastMessage());
-				}
-
 				if (peer->isSelf() && _session->premium()) {
 					ProcessRecentSelfForwards(
 						_session,
@@ -4038,6 +4040,7 @@ void ApiWrap::cancelLocalItem(not_null<HistoryItem*> item) {
 void ApiWrap::sendShortcutMessages(
 		not_null<PeerData*> peer,
 		BusinessShortcutId id) {
+	markReadAfterAction(peer->owner().history(peer));
 	auto ids = QVector<MTPint>();
 	auto randomIds = QVector<MTPlong>();
 	request(MTPmessages_SendQuickReplyMessages(

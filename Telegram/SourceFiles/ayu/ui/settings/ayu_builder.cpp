@@ -19,7 +19,7 @@
 #include "ui/wrap/vertical_layout.h"
 #include "window/window_session_controller.h"
 
-namespace Settings::AyBuilder {
+namespace Settings::AyuBuilder {
 namespace {
 
 [[nodiscard]] QString ResolveTitle(rpl::producer<QString> title) {
@@ -203,7 +203,8 @@ void AyuSectionBuilder::addSlider(SliderArgs &&args) {
 				st::autoDownloadLimitSlider,
 				st::settingsScaleLabel,
 				0,
-				args.showTitle ? st::settingsScaleLabel.style.font->width("8%%%") : 0);
+				args.showTitle ? st::settingsScaleLabel.style.font->width("8%%%") : 0,
+				true);
 			container->add(
 				std::move(sliderWithLabel.widget),
 				st::recentStickersLimitPadding);
@@ -265,4 +266,4 @@ void AyuSectionBuilder::addSectionDivider() {
 	_builder.addSkip();
 }
 
-} // namespace Settings::AyBuilder
+} // namespace Settings::AyuBuilder

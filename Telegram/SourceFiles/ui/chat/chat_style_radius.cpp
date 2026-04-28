@@ -51,7 +51,6 @@ base::options::toggle UseSmallMsgBubbleRadius({
 	.id = kOptionUseSmallMsgBubbleRadius,
 	.name = "Use small message bubble radius",
 	.description = "Makes most message bubbles square-ish.",
-	.scope = static_cast<base::options::details::ScopeFlag>(0),
 	.restartRequired = true,
 });
 

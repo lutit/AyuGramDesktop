@@ -411,6 +411,12 @@ void ScheduledWidget::setupComposeControls() {
 			[=] { _choosingAttach = false; chooseAttach(); });
 	}, lifetime());
 
+	_composeControls->setSendAsFileConfirmed(crl::guard(this, [=](
+			std::shared_ptr<Ui::PreparedBundle> bundle,
+			Api::SendOptions options) {
+		sendingFilesConfirmed(std::move(bundle), options);
+	}));
+
 	_composeControls->fileChosen(
 	) | rpl::on_next([=](ChatHelpers::FileChosen data) {
 		controller()->hideLayer(anim::type::normal);
@@ -578,7 +584,8 @@ bool ScheduledWidget::confirmSendingFiles(
 
 	box->setConfirmedCallback(crl::guard(this, [=](
 			std::shared_ptr<Ui::PreparedBundle> bundle,
-			Api::SendOptions options) {
+			Api::SendOptions options,
+			FullReplyTo) {
 		sendingFilesConfirmed(std::move(bundle), options);
 	}));
 	box->setCancelledCallback(_composeControls->restoreTextCallback(
@@ -1472,7 +1479,8 @@ void ScheduledWidget::listMarkContentsRead(
 }
 
 MessagesBarData ScheduledWidget::listMessagesBar(
-		const std::vector<not_null<Element*>> &elements) {
+		const std::vector<not_null<Element*>> &elements,
+		bool markLastAsRead) {
 	return {};
 }
 
@@ -1751,7 +1759,6 @@ bool ShowScheduledVideoPublished(
 		widget.get(),
 		rpl::single(view),
 		st::processingVideoView);
-	button->setTextTransform(Ui::RoundButton::TextTransform::NoTransform);
 	button->show();
 	rpl::combine(
 		widget->sizeValue(),

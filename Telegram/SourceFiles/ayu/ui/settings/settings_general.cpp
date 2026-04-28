@@ -30,7 +30,7 @@
 namespace Settings {
 
 using namespace Builder;
-using namespace AyBuilder;
+using namespace AyuBuilder;
 
 namespace {
 
@@ -328,12 +328,16 @@ void BuildQoLToggles(SectionBuilder &builder, AyuSectionBuilder &ayu) {
 
 	builder.addSubsectionTitle(tr::ayu_CategoryGeneral());
 
-	ayu.addSettingToggle({
+	const auto controller = builder.controller();
+	ayu.addToggle({
 		.id = u"ayu/disableStories"_q,
 		.altIds = { u"ayu/hideStories"_q },
 		.title = tr::ayu_DisableStories(),
-		.getter = &AyuSettings::disableStories,
-		.setter = &AyuSettings::setDisableStories,
+		.getter = [=] { return settings->disableStories(); },
+		.setter = [=](bool enabled) {
+			AyuSettings::getInstance().setDisableStories(enabled);
+			ShowRestartPrompt(controller);
+		},
 	});
 
 	ayu.addSettingToggle({
@@ -370,7 +374,6 @@ void BuildQoLToggles(SectionBuilder &builder, AyuSectionBuilder &ayu) {
 
 	ayu.addSectionDivider();
 
-	const auto controller = builder.controller();
 	const auto zalgoButton = builder.addButton({
 		.id = u"ayu/filterZalgo"_q,
 		.title = tr::ayu_FilterZalgo(),

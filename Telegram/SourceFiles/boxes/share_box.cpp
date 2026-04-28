@@ -64,8 +64,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include <QtGui/QClipboard>
 
 // AyuGram includes
-#include "ayu/ayu_settings.h"
-#include "ayu/utils/telegram_helpers.h"
 #include "ayu/features/forward/ayu_forward.h"
 
 
@@ -1878,12 +1876,6 @@ ShareBox::SubmitCallback ShareBox::DefaultForwardCallback(
 			const auto requestDone = [=](
 					const MTPUpdates &updates,
 					mtpRequestId requestKey) {
-				const auto &ghost = AyuSettings::ghost(&history->owner().session());
-				if (!ghost.sendReadMessages() && ghost.markReadAfterAction() && history->lastMessage())
-				{
-					readHistory(history->lastMessage());
-				}
-
 				if (showRecentForwardsToSelf) {
 					ApiWrap::ProcessRecentSelfForwards(
 						&threadHistory->session(),
@@ -2076,16 +2068,18 @@ void FastShareMessageToSelf(
 		std::shared_ptr<Main::SessionShow> show,
 		not_null<HistoryItem*> item) {
 	const auto self = show->session().user();
+	auto &owner = self->owner();
+	const auto items = owner.idsToItems(owner.itemOrItsGroup(item));
 	const auto donePhraseArgs = ChatHelpers::ForwardedMessagePhraseArgs{
 		.toCount = 1,
-		.singleMessage = true,
+		.singleMessage = (items.size() == 1),
 		.to1 = self,
 		.to2 = nullptr,
 	};
-	auto sendAction = Api::SendAction(self->owner().history(self));
+	auto sendAction = Api::SendAction(owner.history(self));
 	sendAction.clearDraft = false;
 	show->session().api().forwardMessages(
-		Data::ResolvedForwardDraft{ .items = {item} },
+		Data::ResolvedForwardDraft{ .items = items },
 		std::move(sendAction),
 		[=] {
 			auto phrase = rpl::variable<TextWithEntities>(

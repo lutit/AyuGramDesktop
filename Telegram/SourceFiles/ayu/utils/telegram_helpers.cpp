@@ -15,7 +15,11 @@
 #include "ayu/data/entities.h"
 #include "ayu/data/messages_storage.h"
 #include "ayu/features/filters/filters_controller.h"
+#include "ayu/ui/boxes/donate_info_box.h"
+#include "ayu/ui/toasts.h"
 #include "ayu/utils/rc_manager.h"
+#include "core/core_settings.h"
+#include "core/application.h"
 #include "base/unixtime.h"
 #include "core/mime_type.h"
 #include "data/data_channel.h"
@@ -43,11 +47,14 @@
 #include "styles/style_ayu_styles.h"
 #include "styles/style_info.h"
 #include "ui/emoji_config.h"
+#include "ui/layers/generic_box.h"
 #include "ui/text/format_values.h"
 #include "ui/text/text_entity.h"
 #include "ui/text/format_values.h"
 #include "ui/toast/toast.h"
+#include "window/window_controller.h"
 
+#include <atomic>
 #include <functional>
 #include <latch>
 #include <QTimer>
@@ -259,13 +266,31 @@ Fn<void()> badgeClickHandler(not_null<PeerData*> peer) {
 			return;
 		}
 
-		Ui::Toast::Show({
+		auto config = Ui::Toast::Config{
 			.text = text,
 			.iconContent = MakeBadgeToastIcon(peer, badge),
 			.st = &st::exteraBadgeToast,
 			.adaptive = true,
 			.duration = 3 * crl::time(1000),
-		});
+		};
+		if (badge.badge == Info::Profile::BadgeType::ExteraSupporter) {
+			Ayu::Ui::ShowToastWithAction(
+				std::move(config),
+				tr::lng_collectible_learn_more(tr::now),
+				[=] {
+					const auto window = Core::App().activeWindow();
+					const auto controller = window
+						? window->sessionController()
+						: nullptr;
+					if (!controller) {
+						return;
+					}
+					controller->show(Box(Ui::FillDonateInfoBox, controller));
+					window->activate();
+				});
+		} else {
+			Ui::Toast::Show(std::move(config));
+		}
 	};
 }
 
@@ -419,6 +444,16 @@ void readHistory(not_null<HistoryItem*> message) {
 
 	if (history->unreadReactions().has()) {
 		readReactions(history->asThread());
+	}
+}
+
+void markReadAfterAction(not_null<History*> history) {
+	const auto &ghost = AyuSettings::ghost(&history->session());
+	if (ghost.sendReadMessages() || !ghost.markReadAfterAction()) {
+		return;
+	}
+	if (const auto last = history->lastServerMessage()) {
+		readHistory(last);
 	}
 }
 
@@ -856,7 +891,8 @@ void searchPeerInner(const QString &peerId, Main::Session *session, const Userna
 }
 
 void searchPeer(const QString &peerId, Main::Session *session, const UsernameResolverCallback &callback) {
-	if (!session) {
+	callback(QString(), nullptr);
+	/*if (!session) {
 		callback(QString(), nullptr);
 		return;
 	}
@@ -872,7 +908,7 @@ void searchPeer(const QString &peerId, Main::Session *session, const UsernameRes
 			{
 				searchPeerInner(peerId, session, callback);
 			});
-	}
+	}*/
 }
 
 void searchUserById(ID userId, Main::Session *session, const UsernameResolverCallback &callback) {
@@ -1101,6 +1137,8 @@ TextWithEntities reverseLocalPremiumEmoji(const TextWithEntities &text, not_null
 	const auto set = sets
 		? sets->find(channel->mgInfo->emojiSet.id)
 		: decltype(sets->cend()){};
+	const auto premium = (history->owner().session().user()->flags()
+		& UserDataFlag::Premium);
 	const auto emojiAllowed = [=](const EntityInText& entity)
 	{
 		if (!sets || set == sets->cend()) {
@@ -1123,14 +1161,22 @@ TextWithEntities reverseLocalPremiumEmoji(const TextWithEntities &text, not_null
 
 	auto result = text;
 	for (auto &entity : result.entities) {
-		if (entity.type() == EntityType::CustomEmoji && entity.isLocal()) {
-			if (isForQuote || (!history->peer->isSelf() && !(history->owner().session().user()->flags() & UserDataFlag::Premium) && !emojiAllowed(entity))) {
-				entity = EntityInText(
-					EntityType::CustomUrl,
-					entity.offset(),
-					entity.length(),
-					u"tg://emoji?id="_q + entity.data());
-			}
+		if (entity.type() != EntityType::CustomEmoji) {
+			continue;
+		}
+		const auto shouldConvert = entity.isLocal()
+			? (isForQuote
+				|| (!history->peer->isSelf() && !premium && !emojiAllowed(entity)))
+			: (!isForQuote
+				&& !history->peer->isSelf()
+				&& !premium
+				&& !emojiAllowed(entity));
+		if (shouldConvert) {
+			entity = EntityInText(
+				EntityType::CustomUrl,
+				entity.offset(),
+				entity.length(),
+				u"tg://emoji?id="_q + entity.data());
 		}
 	}
 	return result;
@@ -1165,49 +1211,6 @@ void applyLocalPremiumEmoji(TextWithEntities &text) {
 			}
 		}
 	}
-}
-
-void resolveAllChats(const std::map<long long, QString> &peers) {
-	auto session = currentSession();
-
-	crl::async([=, &session]
-	{
-		while (!peers.empty()) {
-			for (const auto &[id, username] : peers) {
-                auto latch = std::make_shared<TimedCountDownLatch>(1);
-
-				auto onSuccess = [=, &latch](const MTPChatInvite &invite)
-				{
-					invite.match([=](const MTPDchatInvite &data)
-								 {
-								 },
-								 [=](const MTPDchatInviteAlready &data)
-								 {
-									 if (const auto chat = session->data().processChat(data.vchat())) {
-										 if (const auto channel = chat->asChannel()) {
-											 channel->clearInvitePeek();
-										 }
-									 }
-								 },
-								 [=](const MTPDchatInvitePeek &data)
-								 {
-								 });
-
-					latch->countDown();
-				};
-				auto onFail = [=, &latch](const MTP::Error &error)
-				{
-					if (MTP::IsFloodError(error.type())) {
-						std::this_thread::sleep_for(std::chrono::seconds(20));
-					}
-					latch->countDown();
-				};
-
-				session->api().checkChatInvite(username, onSuccess, onFail);
-				latch->await(std::chrono::seconds(20));
-			}
-		}
-	});
 }
 
 not_null<Main::Session*> currentSession() {
@@ -1519,7 +1522,7 @@ QString getBetterLinkPreview(const QString &url) {
 	} else if (host == u"reddit.com"_q || host == u"www.reddit.com"_q) {
 		parsed.setHost(u"vxreddit.com"_q);
 	} else if (host == u"instagram.com"_q || host == u"www.instagram.com"_q) {
-		parsed.setHost(u"kkinstagram.com"_q);
+		parsed.setHost(u"kkclip.com"_q);
 	} else if (host == u"pixiv.net"_q || host == u"www.pixiv.net"_q) {
 		parsed.setHost(u"phixiv.net"_q);
 	} else {
@@ -1535,6 +1538,9 @@ void applyGhostScheduling(
 		int delaySeconds) {
 	const auto &ghost = AyuSettings::ghost(session);
 	if (ghost.isUseScheduledMessages() && !options.scheduled) {
-		options.scheduled = base::unixtime::now() + delaySeconds;
+		const auto delay = Core::App().settings().proxy().isEnabled()
+			? (delaySeconds * 6 + 4) / 5 //ceil(delaySeconds * 1.2)
+			: delaySeconds;
+		options.scheduled = base::unixtime::now() + delay;
 	}
 }

@@ -73,6 +73,7 @@ bool isMessageHidden(not_null<HistoryItem*> item);
 void MarkAsReadChatList(not_null<Dialogs::MainList*> list);
 void MarkAsReadThread(not_null<Data::Thread*> thread);
 
+void markReadAfterAction(not_null<History*> history);
 void readHistory(not_null<HistoryItem*> message);
 
 QString formatTTL(int time, bool isDoc);
@@ -105,7 +106,6 @@ bool mediaDownloadable(const Data::Media* media);
 TextWithEntities reverseLocalPremiumEmoji(const TextWithEntities &text, not_null<History *> history, bool isForQuote = false);
 void applyLocalPremiumEmoji(TextWithEntities &text);
 
-void resolveAllChats(const std::map<long long, QString> &peers);
 not_null<Main::Session *> currentSession();
 
 PeerData* getPeerFromDialogId(ID id);

@@ -127,7 +127,6 @@ base::options::toggle ShowPeerIdBelowAbout({
 	.name = "Show Peer IDs in Profile",
 	.description = "Show peer IDs from API below their Bio / Description."
 		" Add contact IDs to exported data.",
-	.scope = static_cast<base::options::details::ScopeFlag>(0),
 });
 
 base::options::toggle ShowChannelJoinedBelowAbout({
@@ -222,26 +221,11 @@ base::options::toggle ShowChannelJoinedBelowAbout({
 	return AboutValue(
 		peer
 	) | rpl::map([=](TextWithEntities &&value) {
-		if (ShowPeerIdBelowAbout.value()) {
-			using namespace Ui::Text;
-			if (!value.empty()) {
-				value.append("\n\n");
-			}
-			value.append(Italic(u"id: "_q));
-			const auto raw = peer->id.value & PeerId::kChatTypeMask;
-			value.append(Link(
-				Italic(Lang::FormatCountDecimal(raw)),
-				"internal:~peer_id~:copy:" + QString::number(raw)));
-		}
 		if (ShowChannelJoinedBelowAbout.value()) {
 			if (const auto channel = peer->asChannel()) {
 				if (!channel->amCreator() && channel->inviteDate) {
 					if (!value.empty()) {
-						if (ShowPeerIdBelowAbout.value()) {
-							value.append("\n");
-						} else {
-							value.append("\n\n");
-						}
+						value.append("\n\n");
 					}
 					using namespace Ui::Text;
 					value.append((channel->isMegagroup()
@@ -407,6 +391,7 @@ base::options::toggle ShowChannelJoinedBelowAbout({
 			st::infoHoursOuter),
 		st::infoProfileLabeledPadding - st::infoHoursOuterMargin);
 	const auto button = result->entity();
+	button->setTextTransform(Ui::RoundButtonTextTransform::ToUpper);
 	const auto inner = Ui::CreateChild<Ui::VerticalLayout>(button);
 	button->widthValue() | rpl::on_next([=](int width) {
 		const auto margin = st::infoHoursOuterMargin;
@@ -643,7 +628,6 @@ base::options::toggle ShowChannelJoinedBelowAbout({
 		labelWrap,
 		std::move(linkText),
 		st::defaultTableSmallButton);
-	link->setTextTransform(Ui::RoundButton::TextTransform::NoTransform);
 	link->setClickedCallback([=] {
 		state->myTimezone = !state->myTimezone.current();
 		state->expanded = true;
@@ -897,6 +881,7 @@ void DeleteContactNote(
 		st::infoProfileLabeledPadding - st::infoHoursOuterMargin);
 	result->setDuration(st::infoSlideDuration);
 	const auto button = result->entity();
+	button->setTextTransform(Ui::RoundButtonTextTransform::ToUpper);
 
 	auto outer = Ui::CreateChild<Ui::SlideWrap<Ui::VerticalLayout>>(
 		button,
@@ -2007,7 +1992,6 @@ object_ptr<Ui::RpWidget> DetailsFiller::setupInfo() {
 				}
 				return false;
 			});
-			AddRegistrationOrCreationButton(controller, _peer, idInfo, fitLabelToButton);
 		}
 	}
 	wrap->toggleOn(tracker.atLeastOneShownValue());
@@ -2335,7 +2319,6 @@ void DetailsFiller::setupMainApp(bool suppressBottom) {
 			st::infoOpenApp),
 		st::infoOpenAppMargin,
 		style::al_justify);
-	button->setTextTransform(Ui::RoundButton::TextTransform::NoTransform);
 
 	const auto user = _peer->asUser();
 	const auto controller = _controller->parentController();
@@ -3043,11 +3026,7 @@ void ActionsFiller::fillUserActions(not_null<UserData*> user) {
 	if (!user->isSelf() && !user->isSupport() && !user->isVerifyCodes()) {
 		if (user->isBot()) {
 			addBotCommandActions(user);
-		}
-		_wrap->add(CreateSkipWidget(
-			_wrap,
-			st::infoBlockButtonSkip));
-		if (user->isBot()) {
+			_wrap->add(CreateSkipWidget(_wrap, st::infoBlockButtonSkip));
 			addReportAction();
 		}
 		addBlockAction(user);

@@ -30,7 +30,6 @@ base::options::toggle TabbedPanelShowOnClick({
 	.id = kOptionTabbedPanelShowOnClick,
 	.name = "Show tabbed panel by click",
 	.description = "Show Emoji / Stickers / GIFs panel only after a click.",
-	.scope = static_cast<base::options::details::ScopeFlag>(0),
 });
 
 } // namespace
@@ -38,7 +37,7 @@ base::options::toggle TabbedPanelShowOnClick({
 const char kOptionTabbedPanelShowOnClick[] = "tabbed-panel-show-on-click";
 
 bool ShowPanelOnClick() {
-	return TabbedPanelShowOnClick.value();
+	return !AyuSettings::getInstance().showEmojiPopup();
 }
 
 TabbedPanel::TabbedPanel(
@@ -192,6 +191,10 @@ void TabbedPanel::setDesiredHeightValues(
 	_minContentHeight = minHeight;
 	_maxContentHeight = maxHeight;
 	updateContentHeight();
+}
+
+void TabbedPanel::setShowAnimationOrigin(Ui::PanelAnimation::Origin origin) {
+	_showAnimationOrigin = origin;
 }
 
 void TabbedPanel::setDropDown(bool dropDown) {
@@ -382,11 +385,12 @@ void TabbedPanel::startShowAnimation() {
 	if (!_a_show.animating()) {
 		auto image = grabForAnimation();
 
+		const auto origin = _showAnimationOrigin.value_or(_dropDown
+			? Ui::PanelAnimation::Origin::TopRight
+			: Ui::PanelAnimation::Origin::BottomRight);
 		_showAnimation = std::make_unique<Ui::PanelAnimation>(
 			_selector->st().showAnimation,
-			(_dropDown
-				? Ui::PanelAnimation::Origin::TopRight
-				: Ui::PanelAnimation::Origin::BottomRight));
+			origin);
 		auto inner = rect().marginsRemoved(st::emojiPanMargins);
 		_showAnimation->setFinalImage(
 			std::move(image),
@@ -487,7 +491,7 @@ void TabbedPanel::showStarted() {
 bool TabbedPanel::eventFilter(QObject *obj, QEvent *e) {
 	const auto &settings = AyuSettings::getInstance();
 
-	if (TabbedPanelShowOnClick.value() || !settings.showEmojiPopup()) {
+	if (!settings.showEmojiPopup()) {
 		return false;
 	} else if (e->type() == QEvent::Enter) {
 		otherEnter();

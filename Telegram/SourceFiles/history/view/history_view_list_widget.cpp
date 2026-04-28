@@ -16,6 +16,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "history/history_item_components.h"
 #include "history/history_item_helpers.h"
 #include "history/history_item_text.h"
+#include "history/history_streamed_drafts.h"
 #include "history/view/media/history_view_media.h"
 #include "history/view/media/history_view_sticker.h"
 #include "history/view/reactions/history_view_reactions.h"
@@ -92,6 +93,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include <QtCore/QMimeData>
 
 // AyuGram includes
+#include "ayu/features/filters/filters_cache_controller.h"
 #include "ayu/utils/telegram_helpers.h"
 
 
@@ -486,6 +488,12 @@ ListWidget::ListWidget(
 			resizeItem(view);
 		}
 	}, lifetime());
+	_session->data().viewHeightAdjusted(
+	) | rpl::on_next([this](Data::Session::ViewHeightAdjusted data) {
+		if (data.view->delegate() == this) {
+			viewHeightAdjusted(data.view);
+		}
+	}, lifetime());
 	_session->data().itemViewRefreshRequest(
 	) | rpl::on_next([this](auto item) {
 		if (const auto view = viewForItem(item)) {
@@ -510,6 +518,23 @@ ListWidget::ListWidget(
 		if (const auto view = viewForItem(item)) {
 			view->itemDataChanged();
 		}
+	}, lifetime());
+
+	rpl::merge(
+		_session->changes().peerUpdates(
+			Data::PeerUpdate::Flag::IsBlocked
+		) | rpl::to_empty,
+		FiltersCacheController::updates()
+	) | rpl::on_next([=] {
+		crl::on_main(this, [=] {
+			if (_viewsCapacity.empty()) {
+				for (const auto &view : _items) {
+					view->setPendingResize();
+				}
+				const auto old = _slice;
+				refreshRows(old);
+			}
+		});
 	}, lifetime());
 
 	_session->downloaderTaskFinished(
@@ -664,6 +689,10 @@ void ListWidget::refreshRows(const Data::MessagesSlice &old) {
 
 	saveScrollState();
 
+	const auto scrolledTillEnd = _itemsKnownTillEnd
+		&& (_visibleBottom == height())
+		&& (_visibleBottom > _visibleTop);
+
 	const auto addedToEndFrom = (old.skippedAfter == 0
 		&& (_slice.skippedAfter == 0)
 		&& !old.ids.empty())
@@ -701,7 +730,10 @@ void ListWidget::refreshRows(const Data::MessagesSlice &old) {
 		_translateTracker->addBunchFrom(_items);
 	}
 	for (auto e = end(_items), i = e - addedToEndCount; i != e; ++i) {
-		_itemRevealPending.emplace(*i);
+		const auto item = (*i)->data();
+		if (!item->history()->streamedDrafts().hasFor(item)) {
+			_itemRevealPending.emplace(*i);
+		}
 	}
 	updateAroundPositionFromNearest(nearestIndex);
 
@@ -722,7 +754,8 @@ void ListWidget::refreshRows(const Data::MessagesSlice &old) {
 	}
 	_viewsCapacity.clear();
 
-	checkUnreadBarCreation();
+	const auto markLastAsRead = (scrolledTillEnd && markingMessagesRead());
+	checkUnreadBarCreation(markLastAsRead);
 	restoreScrollState();
 	if (!_itemsRevealHeight) {
 		mouseActionUpdate(QCursor::pos());
@@ -1003,18 +1036,21 @@ void ListWidget::computeScrollTo(
 	scrollTo(wanted, position, scrollDelta, type);
 }
 
-void ListWidget::checkUnreadBarCreation() {
-	if (!_bar.element) {
-		if (auto data = _delegate->listMessagesBar(_items); data.bar.element) {
-			_bar = std::move(data.bar);
-			_barText = std::move(data.text);
-			if (!_bar.hidden) {
-				_bar.element->createUnreadBar(_barText.value());
-				const auto i = ranges::find(_items, not_null{ _bar.element });
-				Assert(i != end(_items));
-				refreshAttachmentsAtIndex(i - begin(_items));
-			}
-		}
+void ListWidget::checkUnreadBarCreation(bool markLastAsRead) {
+	if (_bar.element) {
+		return;
+	}
+	auto data = _delegate->listMessagesBar(_items, markLastAsRead);
+	if (!data.bar.element) {
+		return;
+	}
+	_bar = std::move(data.bar);
+	_barText = std::move(data.text);
+	if (!_bar.hidden) {
+		_bar.element->createUnreadBar(_barText.value());
+		const auto i = ranges::find(_items, not_null{ _bar.element });
+		Assert(i != end(_items));
+		refreshAttachmentsAtIndex(i - begin(_items));
 	}
 }
 
@@ -4377,6 +4413,30 @@ void ListWidget::refreshAttachmentsFromTill(int from, int till) {
 	if (till == int(_items.size())) {
 		_items.back()->setAttachToNext(false);
 	}
+}
+
+void ListWidget::viewHeightAdjusted(not_null<Element*> view) {
+	const auto i = ranges::find(_items, view);
+	if (i == end(_items)) {
+		return;
+	}
+	auto next = i + 1;
+	const auto was = (next != end(_items))
+		? (*next)->y()
+		: _itemsHeight;
+	const auto now = view->y() + view->height();
+	const auto delta = now - was;
+	for (; next != end(_items); ++next) {
+		(*next)->setY((*next)->y() + delta);
+	}
+	_itemsHeight += delta;
+	_itemsTop = (_minHeight > _itemsHeight + st::historyPaddingBottom)
+		? (_minHeight - _itemsHeight - st::historyPaddingBottom)
+		: 0;
+	resize(width(), _itemsTop + _itemsHeight + st::historyPaddingBottom);
+	restoreScrollPosition();
+	updateVisibleTopItem();
+	update();
 }
 
 void ListWidget::refreshItem(not_null<const Element*> view) {
